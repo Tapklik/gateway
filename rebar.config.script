@@ -1,0 +1,10 @@
+Defs1 = case os:getenv("DEBUG") of
+           false -> [];
+           _ -> [{d, debug}]
+       end,
+Defs2 = case os:getenv("LOCAL") of
+           false -> [];
+           _ -> [{d, local}]
+       end,
+lists:keystore(erl_opts, 1, CONFIG,
+               {erl_opts, proplists:get_value(erl_opts, CONFIG, []) ++ Defs1 ++ Defs2}).

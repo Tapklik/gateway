@@ -1,0 +1,22 @@
+%%-*- mode: erlang -*-
+{application, gateway, [
+	{description, ""},
+	{vsn, "0.1.0"},
+	{registered, []},
+	{applications, [
+		kernel,
+		stdlib,
+		crypto,
+		lager,
+		cowboy,
+		compiler,
+		syntax_tools,
+		goldrush,
+		sasl,
+		statsderl,
+		bertconf
+	]},
+	{included_applications, [pooler]},
+	{mod, {gateway, []}},
+	{env, []}
+]}.
