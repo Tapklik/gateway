@@ -147,7 +147,7 @@ handle_info({interval}, State) ->
 				R when TimeScale == 1 ->
 					TimeStamp = trunc(Time - (Time rem (300 * ?SEC))),
 					ets:insert(time, {timestamp, TimeStamp});
-				R when R > 300 - TimeScale ->
+				R when R >= 300 - TimeScale ->
 					TimeStamp = trunc(Time - (Time rem (300 * ?SEC))),
 					ets:insert(time, {timestamp, TimeStamp});
 				_ ->
