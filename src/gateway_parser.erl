@@ -71,6 +71,7 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) -> tk_lib:echo1(rsp_unparsed, RSP0),
 									 "&c=", Cmp/binary,
 									 "&cr=", Crid/binary,
 									 "&ts=", TsBinary/binary,
+									 "&x=", Exchange/binary,
 									 "&test=1"
 								 >>;
 							  _->
@@ -78,6 +79,7 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) -> tk_lib:echo1(rsp_unparsed, RSP0),
 									 "bidid=", BidId/binary,
 									 "&c=", Cmp/binary,
 									 "&cr=", Crid/binary,
+									 "&x=", Exchange/binary,
 									 "&ts=", TsBinary/binary
 								 >>
 						 end,
