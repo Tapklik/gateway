@@ -31,7 +31,7 @@ init(Req, State) ->
 	[Node, Host] = binary:split(atom_to_binary(node(), latin1), <<"@">>),
 	Prefix = <<"bids.gw.", Node/binary, "__", Host/binary, ".">>,
 	statsderl:increment(<<Prefix/binary, "br.total">>, 1, ?STATS_P),
-	{ok, BRjson, _} = cowboy_req:read_body(Req),
+	{ok, BRjson, _} = cowboy_req:read_body(Req), tk_lib:echo1(brjson, BRjson),
 	BR = jsx:decode(BRjson, [return_maps]),
 	case gateway_bids_handler:start_link() of
 		{ok, Worker} ->
