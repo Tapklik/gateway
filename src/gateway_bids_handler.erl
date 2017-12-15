@@ -111,7 +111,7 @@ loop(Parent, Debug, State) ->
 			Exchange = State#state.exchange,
 			DebugBid = State#state.debug,
 			TimeStamp = State#state.timestamp,
-			RSPmap1 = gateway_parser:parse_rsp(Exchange, BidId, RSPmap0, TimeStamp), tk_lib:echo1(rsp, RSPmap1),
+			RSPmap1 = gateway_parser:parse_rsp(Exchange, BidId, RSPmap0, TimeStamp),
 			RSPTime = calc_time(State#state.t1),
 			%% Log bid if DebugBid = true (should be compiled with debug enabled)
 			log_bid(BidId, [{<<"rsp">>, RSPmap1}, {<<"rsp_time">>, RSPTime}], DebugBid),
