@@ -111,11 +111,13 @@ loop(Parent, Debug, State) ->
 			Exchange = State#state.exchange,
 			DebugBid = State#state.debug,
 			TimeStamp = State#state.timestamp,
+			RSPTime1 = calc_time(State#state.t1),
 			RSPmap1 = gateway_parser:parse_rsp(Exchange, BidId, RSPmap0, TimeStamp),
-			RSPTime = calc_time(State#state.t1),
+			RSPTime2 = calc_time(State#state.t1),
 			%% Log bid if DebugBid = true (should be compiled with debug enabled)
-			log_bid(BidId, [{<<"rsp">>, RSPmap1}, {<<"rsp_time">>, RSPTime}], DebugBid),
-			statsderl:timing(<<Prefix/binary, "rsp.time.internal">>, RSPTime, ?STATS_P),
+			log_bid(BidId, [{<<"rsp">>, RSPmap1}, {<<"rsp_time">>, RSPTime2}], DebugBid),
+			statsderl:timing(<<Prefix/binary, "rsp.time.internal_1">>, RSPTime1, ?STATS_P),
+			statsderl:timing(<<Prefix/binary, "rsp.time.internal_2">>, RSPTime1, ?STATS_P),
 			State#state.from ! {rsp, BidId, RSPmap1};
 
 	%% Receiving response from bidders; Other can be: invalid_br, invalid_rsp, timeout
