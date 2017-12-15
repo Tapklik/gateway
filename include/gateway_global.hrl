@@ -3,9 +3,8 @@
 %%%%%%%%%%%%%%%%%%%%%%
 
 %% SYSTEM SETTINGS
--define(AUCTION_TIMEOUT, 50).
 -define(BID_TIMEOUT, 80).
--define(STATS_P, 1.0).
+-define(STATS_P, 0.3).
 -define(FILTERING, true).
 -define(NODE, node()).
 -define(DATA_PATH, "./data/"). %% Add the trailing "/"
