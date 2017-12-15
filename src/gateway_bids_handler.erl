@@ -92,7 +92,7 @@ loop(Parent, Debug, State) ->
 					   end,
 
 			%% Parsing original BR to the internal format
-			BRparsed = gateway_parser:parse_br(BR), tk_lib:echo1(br_parsed, BRparsed),
+			BRparsed = gateway_parser:parse_br(BR),
 			%% Augmenting with additional data: BR -> BR+
 			BRplus = gateway_augmentor:augment_br(BRparsed),
 
