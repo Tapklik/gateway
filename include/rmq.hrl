@@ -48,6 +48,7 @@
 	#publisher{
 		name = bids_debug,
 		exchange = <<"bids">>,
+		logging = false,
 		topic = <<"bids.debug">>,
 		pool_size = 30}
 ]).
