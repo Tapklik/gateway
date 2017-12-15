@@ -4,7 +4,7 @@
 
 %% SYSTEM SETTINGS
 -define(AUCTION_TIMEOUT, 50).
--define(BID_TIMEOUT, 120).
+-define(BID_TIMEOUT, 80).
 -define(STATS_P, 1.0).
 -define(FILTERING, true).
 -define(NODE, node()).
