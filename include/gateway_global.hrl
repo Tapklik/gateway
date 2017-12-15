@@ -5,7 +5,7 @@
 %% SYSTEM SETTINGS
 -define(AUCTION_TIMEOUT, 50).
 -define(BID_TIMEOUT, 120).
--define(STATS_P, 0.1).
+-define(STATS_P, 1.0).
 -define(FILTERING, true).
 -define(NODE, node()).
 -define(DATA_PATH, "./data/"). %% Add the trailing "/"
@@ -32,7 +32,7 @@
 	}
 ).
 
--define(ADX03_BID_TYPE, <<"random">>).
+-define(ADX03_BID_TYPE, <<"variance">>).
 -define(ADX03_GW_ACCEPTORS, 2000).
 -define(ADX03_GW_PORT, 2234).
 -define(ADX03_MAX_KEEPALIVE, 1000).
