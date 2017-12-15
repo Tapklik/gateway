@@ -55,7 +55,7 @@ parse_br([{Parameter, Fun, Args} | T], BR, BRmap) ->
 	parse_br(T, BR, BRmap2).
 
 -spec parse_rsp(binary(), binary(), rsp(), integer()) -> rsp().
-parse_rsp(Exchange, BidId, RSP0, TimeStamp) -> tk_lib:echo1(rsp_unparsed, RSP0),
+parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 	Cmp = tk_maps:get([<<"cid">>], RSP0),
 	Crid = tk_maps:get([<<"creative">>, <<"crid">>], RSP0),
 	case try_ets_lookup(exchanges, Exchange, not_found) of
@@ -86,8 +86,8 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) -> tk_lib:echo1(rsp_unparsed, RSP0),
 			NurlPath = list_to_binary(?NURL_PATH),
 			Nurl1 = <<NurlPath/binary, BidderAttr/binary>>,
 			Nurl2 = binary:replace(Nurl0, <<"{{nurl_path}}">>, Nurl1),
-			Adm1 = tk_maps:get([<<"creative">>, <<"adm">>], RSP0), tk_lib:echo1(rsp, RSP0),
-			Adm2 = binary:replace(Adm1, <<"{{BIDDER_ATTR}}">>, BidderAttr), tk_lib:echo1(adm, Adm2),
+			Adm1 = tk_maps:get([<<"creative">>, <<"adm">>], RSP0),
+			Adm2 = binary:replace(Adm1, <<"{{BIDDER_ATTR}}">>, BidderAttr),
 			ImpId = tk_maps:get([<<"creative">>, <<"impid">>], RSP0),
 
 			%% RESPONSE
