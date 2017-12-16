@@ -76,7 +76,7 @@ loop(Parent, Debug, State) ->
 			);
 
 	%% Receiving bid request from Cowboy http handler
-		{From, br, Exchange, BR} ->
+		{From, br, Exchange, BR} -> tk_lib:echo1(br, BR),
 			%% STAT:
 			T1 = erlang:monotonic_time(),
 
