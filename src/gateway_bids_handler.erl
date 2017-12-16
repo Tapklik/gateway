@@ -92,16 +92,19 @@ loop(Parent, Debug, State) ->
 					   end,
 
 			%% Parsing original BR to the internal format
-			BRparsed = gateway_parser:parse_br(BR),
-			%% Augmenting with additional data: BR -> BR+
-			BRplus = gateway_augmentor:augment_br(BRparsed),
+			case gateway_parser:parse_br(BR) of
+				invalid_br -> ok;
+				BRparsed ->
+					%% Augmenting with additional data: BR -> BR+
+					BRplus = gateway_augmentor:augment_br(BRparsed),
 
-			%% Log bid if DebugBid = true (should be compiled with debug enabled)
-			log_bid(BidId, [{<<"br">>, BR}, {<<"br_plus">>, BRplus}, {<<"time">>, time_server:get_iso_time()}], DebugBid),
+					%% Log bid if DebugBid = true (should be compiled with debug enabled)
+					log_bid(BidId, [{<<"br">>, BR}, {<<"br_plus">>, BRplus}, {<<"time">>, time_server:get_iso_time()}], DebugBid),
 
-			%% Retrieve list of available bidders and send BR+ to them
-			[{_, BidderWorkers}] = ets:lookup(bidder_workers, bidders),
-			send_bid_to_bidder(BidId, BRplus, BidderWorkers, TimeStamp, DebugBid),
+					%% Retrieve list of available bidders and send BR+ to them
+					[{_, BidderWorkers}] = ets:lookup(bidder_workers, bidders),
+					send_bid_to_bidder(BidId, BRplus, BidderWorkers, TimeStamp, DebugBid)
+			end,
 			loop(Parent, Debug,
 				#state{from = From, bid_id = BidId, t1 = T1, debug = DebugBid,
 					exchange = Exchange, timestamp = TimeStamp, statsderl_prefix = Prefix});

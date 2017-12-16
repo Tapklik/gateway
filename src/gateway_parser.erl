@@ -39,7 +39,7 @@
 parse_br(BR0) ->
 	parse_br(openrtb_parser(), BR0, #{}).
 parse_br(P, BR, invalid_br) ->
-	?ERROR("GATEWAY: Error parsing BR parameter [ ~p ]. (~n BR:  ~p )", [P, BR]),
+	?WARN("GATEWAY: Error parsing BR parameter [ ~p ]. (~n BR:  ~p )", [P, BR]),
 	invalid_br;
 parse_br([], _BR, BRmap) -> BRmap;
 parse_br([{Parameter, Fun, Args} | T], BR, BRmap) ->
