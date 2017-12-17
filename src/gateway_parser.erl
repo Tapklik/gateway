@@ -102,7 +102,7 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 							#{
 								<<"id">> => BidId,
 								<<"impid">> => ImpId,
-								<<"price">> => tk_maps:get([<<"price">>], RSP0),
+								<<"price">> => trunc(tk_maps:get([<<"price">>], RSP0) * 1000000),
 								<<"adid">> => Crid,
 								<<"adm">> => Adm2,
 								<<"adomain">> => [tk_maps:get([<<"creative">>, <<"adomain">>], RSP0)],
