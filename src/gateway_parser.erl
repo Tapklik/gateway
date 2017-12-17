@@ -91,6 +91,7 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 			Adm1 = tk_maps:get([<<"creative">>, <<"adm">>], RSP0),
 			Adm2 = binary:replace(Adm1, <<"{{BIDDER_ATTR}}">>, BidderAttr),
 			ImpId = tk_maps:get([<<"creative">>, <<"impid">>], RSP0),
+			Price = trunc(tk_maps:get([<<"price">>], RSP0) * 1000000), tk_lib:echo1(price, Price),
 
 			%% RESPONSE
 			#{
@@ -102,7 +103,7 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 							#{
 								<<"id">> => BidId,
 								<<"impid">> => ImpId,
-								<<"price">> => trunc(tk_maps:get([<<"price">>], RSP0) * 1000000),
+								<<"price">> => Price,
 								<<"adid">> => Crid,
 								<<"adm">> => Adm2,
 								<<"adomain">> => [tk_maps:get([<<"creative">>, <<"adomain">>], RSP0)],
