@@ -85,6 +85,7 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 									 "&ts=", TsBinary/binary
 								 >>
 						 end,
+			BRId = tk_maps:get([<<"id">>],RSP0),
 			NurlPath = list_to_binary(?NURL_PATH),
 			Nurl1 = <<NurlPath/binary, BidderAttr/binary>>,
 			Nurl2 = binary:replace(Nurl0, <<"{{nurl_path}}">>, Nurl1),
@@ -95,13 +96,13 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 
 			%% RESPONSE
 			#{
-				<<"id">> => tk_maps:get([<<"id">>],RSP0),
+				<<"id">> => BRId,
 				<<"bidid">> => BidId,
 				<<"seatbid">> => [
 					#{
 						<<"bid">> => [
 							#{
-								<<"id">> => BidId,
+								<<"id">> => BRId,
 								<<"impid">> => ImpId,
 								<<"price">> => Price,
 								<<"adid">> => Crid,
