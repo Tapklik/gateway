@@ -69,20 +69,20 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 			BidderAttr = case TestMode of
 							 1 ->
 								 <<
-									 "bidid=", BidId/binary,
-									 "&c=", Cmp/binary,
-									 "&cr=", Crid/binary,
-									 "&ts=", TsBinary/binary,
-									 "&x=", Exchange/binary,
-									 "&test=1"
+									 "bidid%3D", BidId/binary,
+									 "%26c%3D", Cmp/binary,
+									 "%26cr%3D", Crid/binary,
+									 "%26ts%3D", TsBinary/binary,
+									 "%26x%3D", Exchange/binary,
+									 "%26test%3D1"
 								 >>;
 							  _->
 								 <<
-									 "bidid=", BidId/binary,
-									 "&c=", Cmp/binary,
-									 "&cr=", Crid/binary,
-									 "&x=", Exchange/binary,
-									 "&ts=", TsBinary/binary
+									 "bidid%3D", BidId/binary,
+									 "%26c%3D", Cmp/binary,
+									 "%26cr%3D", Crid/binary,
+									 "%26x%3D", Exchange/binary,
+									 "%26ts%3D", TsBinary/binary
 								 >>
 						 end,
 			BRId = tk_maps:get([<<"id">>],RSP0),
