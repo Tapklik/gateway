@@ -92,6 +92,8 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 			Adm1 = tk_maps:get([<<"creative">>, <<"adm">>], RSP0),
 			Adm2 = binary:replace(Adm1, <<"{{BIDDER_ATTR}}">>, BidderAttr),
 			ImpId = tk_maps:get([<<"creative">>, <<"impid">>], RSP0),
+			Height = tk_maps:get([<<"creative">>, <<"h">>], RSP0),
+			Width = tk_maps:get([<<"creative">>, <<"w">>], RSP0),
 			Price = tk_maps:get([<<"price">>], RSP0),
 
 			%% RESPONSE
@@ -102,10 +104,12 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 					#{
 						<<"bid">> => [
 							#{
-								<<"id">> => BRId,
+								<<"id">> => BidId,
 								<<"impid">> => ImpId,
 								<<"price">> => Price,
-								<<"adid">> => Crid,
+								<<"h">> => Height,
+								<<"w">> => Width,
+ 								<<"adid">> => Crid,
 								<<"adm">> => Adm2,
 								<<"adomain">> => [tk_maps:get([<<"creative">>, <<"adomain">>], RSP0)],
 								<<"cid">> => ?ADX03_BILLING_ID,
