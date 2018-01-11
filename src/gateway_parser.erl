@@ -69,20 +69,20 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 			BidderAttr = case TestMode of
 							 1 ->
 								 <<
-									 "bidid%3D", BidId/binary,
-									 "%26c%3D", Cmp/binary,
-									 "%26cr%3D", Crid/binary,
-									 "%26ts%3D", TsBinary/binary,
-									 "%26x%3D", Exchange/binary,
-									 "%26test%3D1"
+									 "bidid=", BidId/binary,
+									 "&c=", Cmp/binary,
+									 "&cr=", Crid/binary,
+									 "&ts=", TsBinary/binary,
+									 "&x=", Exchange/binary,
+									 "&test=1"
 								 >>;
 							  _->
 								 <<
-									 "bidid%3D", BidId/binary,
-									 "%26c%3D", Cmp/binary,
-									 "%26cr%3D", Crid/binary,
-									 "%26x%3D", Exchange/binary,
-									 "%26ts%3D", TsBinary/binary
+									 "bidid=", BidId/binary,
+									 "&c=", Cmp/binary,
+									 "&cr=", Crid/binary,
+									 "&x=", Exchange/binary,
+									 "&ts=", TsBinary/binary
 								 >>
 						 end,
 			BRId = tk_maps:get([<<"id">>],RSP0),
@@ -90,7 +90,7 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 			Nurl1 = <<NurlPath/binary, BidderAttr/binary>>,
 			Nurl2 = binary:replace(Nurl0, <<"{{nurl_path}}">>, Nurl1),
 			Adm1 = tk_maps:get([<<"creative">>, <<"adm">>], RSP0),
-			Adm2 = binary:replace(Adm1, <<"{{BIDDER_ATTR}}">>, BidderAttr),
+			Adm2 = binary:replace(Adm1, <<"{{BIDDER_ATTR}}">>, tk_lib:escape_uri(BidderAttr)),
 			ImpId = tk_maps:get([<<"creative">>, <<"impid">>], RSP0),
 			Height = tk_maps:get([<<"creative">>, <<"h">>], RSP0),
 			Width = tk_maps:get([<<"creative">>, <<"w">>], RSP0),
