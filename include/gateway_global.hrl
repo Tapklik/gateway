@@ -20,9 +20,12 @@
 
 
 %% ADX COWBOY SETTINGS
--define(ADX03_ID, <<"3">>).
+-define(ADX03_ID, 3).
+-define(ADX03_NURL, <<"{{nurl_path}}&wp=${AUCTION_PRICE}">>).
 -define(ADX03_SEAT, <<"244977050">>).
 -define(ADX03_BILLING_ID, <<"49634885883">>).
+-define(ADX03_PRE_ADM, <<"%%CLICK_URL_UNESC%%">>).
+-define(ADX03_POST_ADM, <<"">>).
 -define(ADX03_RSP_HEADERS,
 	#{
 		<<"content-type">> => <<"application/json">>,

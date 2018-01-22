@@ -60,10 +60,8 @@ parse_br([{Parameter, Fun, Args} | T], BR, BRmap) ->
 parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 	Cmp = tk_maps:get([<<"cid">>], RSP0),
 	Crid = tk_maps:get([<<"creative">>, <<"crid">>], RSP0),
-	case try_ets_lookup(exchanges, Exchange, not_found) of
-		not_found ->
-			invalid_rsp;
-		{_, Nurl0} ->
+	case Exchange of
+		3 ->
 			TsBinary = integer_to_binary(TimeStamp),
 			TestMode = tk_maps:get([<<"test">>], RSP0),
 			BidderAttr = case TestMode of
@@ -73,7 +71,7 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 									 "&c=", Cmp/binary,
 									 "&cr=", Crid/binary,
 									 "&ts=", TsBinary/binary,
-									 "&x=", Exchange/binary,
+									 "&x=3",
 									 "&test=1"
 								 >>;
 							  _->
@@ -81,16 +79,18 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 									 "bidid=", BidId/binary,
 									 "&c=", Cmp/binary,
 									 "&cr=", Crid/binary,
-									 "&x=", Exchange/binary,
+									 "&x=3",
 									 "&ts=", TsBinary/binary
 								 >>
 						 end,
 			BRId = tk_maps:get([<<"id">>],RSP0),
 			NurlPath = list_to_binary(?NURL_PATH),
 			Nurl1 = <<NurlPath/binary, BidderAttr/binary>>,
-			Nurl2 = binary:replace(Nurl0, <<"{{nurl_path}}">>, Nurl1),
+			Nurl2 = binary:replace(?ADX03_NURL	, <<"{{nurl_path}}">>, Nurl1),
 			Adm1 = tk_maps:get([<<"creative">>, <<"adm">>], RSP0),
 			Adm2 = binary:replace(Adm1, <<"{{BIDDER_ATTR}}">>, tk_lib:escape_uri(BidderAttr)),
+			Adm3 = binary:replace(Adm2, <<"{{PRE_ADM}}">>, ?ADX03_PRE_ADM),
+			Adm4 = binary:replace(Adm3, <<"{{POST_ADM}}">>, ?ADX03_POST_ADM),
 			ImpId = tk_maps:get([<<"creative">>, <<"impid">>], RSP0),
 			Height = tk_maps:get([<<"creative">>, <<"h">>], RSP0),
 			Width = tk_maps:get([<<"creative">>, <<"w">>], RSP0),
@@ -110,7 +110,7 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 								<<"h">> => Height,
 								<<"w">> => Width,
  								<<"adid">> => Crid,
-								<<"adm">> => Adm2,
+								<<"adm">> => Adm4,
 								<<"adomain">> => [tk_maps:get([<<"creative">>, <<"adomain">>], RSP0)],
 								<<"cid">> => ?ADX03_BILLING_ID,
 								<<"crid">> => Crid,
@@ -121,7 +121,9 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 					}
 				],
 				<<"cur">> => <<"USD">>
-			}
+			};
+		_ ->
+			invalid_rsp
 	end.
 
 %%%%%%%%%%%%%%%%%%%%%%
