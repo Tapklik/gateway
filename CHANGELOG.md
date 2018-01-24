@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Add ADX_PRE_ADM, ADX_POST_ADM
 
 ### Changed
+- Changed BIDDER_ATTR to ADM_URL
 
 ### Fixed
 
