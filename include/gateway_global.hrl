@@ -8,7 +8,7 @@
 -define(FILTERING, true).
 -define(NODE, node()).
 -define(DATA_PATH, "./data/"). %% Add the trailing "/"
--define(YEAR, 2017).
+-define(YEAR, 2018).
 
 -define(NURL_PATH,
 	application:get_env(gateway, nurl_host, "http://localhost:2250") ++ "/sad23ref34578hj/wins?"). %% Add the trailing "/"

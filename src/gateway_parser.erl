@@ -337,7 +337,17 @@ openrtb_parser() ->
 		{<<"test">>, {find, 0}, [<<"test">>]},
 		{<<"geo">>, parse_geo, [<<"device">>, <<"geo">>]},
 		{<<"bcat">>, parse_cat, [<<"bcat">>]},
-		{<<"cat">>, parse_cat, [[<<"app">>, <<"cat">>], [<<"site">>, <<"cat">>]]},
+		{<<"cat">>, parse_cat, [
+			[<<"app">>, <<"cat">>],
+			[<<"app">>, <<"pagecat">>],
+			[<<"app">>, <<"sectioncat">>],
+			[<<"app">>, <<"content">>, <<"cat">>],
+			[<<"site">>, <<"cat">>],
+			[<<"site">>, <<"pagecat">>],
+			[<<"site">>, <<"sectioncat">>],
+			[<<"app">>, <<"content">>, <<"cat">>]
+		]},
+		{<<"metric">>, {find, []}, [<<"metric">>]},
 		{<<"ip">>, {find, <<"">>}, [<<"device">>, <<"ip">>]},
 		{<<"badv">>, {find, []}, [<<"badv">>]},
 		{<<"bapp">>, {find, []}, [<<"bapp">>]},
@@ -348,6 +358,6 @@ openrtb_parser() ->
 		{<<"allimps">>, {find, 0}, [<<"allimps">>]},
 		{<<"language">>, {find, <<"">>}, [<<"device">>, <<"language">>]},
 		{<<"imp">>, parse_imp, [<<"imp">>]},
-		{<<"user">>, parse_user, [<<"user">>]},
+		{<<"user">>, {find, []}, [<<"user">>]},
 		{<<"">>, {find_either, []}, [{<<"app">>, [<<"app">>]}, {<<"site">>, [<<"site">>]}]}
 	].
