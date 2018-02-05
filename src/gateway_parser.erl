@@ -372,6 +372,14 @@ get_cat_root(Cat) ->
 %% @hidden
 cat_value_to_binary(<<"0">>) -> 0;
 cat_value_to_binary(<<"1">>) -> 1;
+cat_value_to_binary(<<"2">>) -> 2;
+cat_value_to_binary(<<"3">>) -> 3;
+cat_value_to_binary(<<"4">>) -> 4;
+cat_value_to_binary(<<"5">>) -> 5;
+cat_value_to_binary(<<"6">>) -> 6;
+cat_value_to_binary(<<"7">>) -> 7;
+cat_value_to_binary(<<"8">>) -> 8;
+cat_value_to_binary(<<"9">>) -> 9;
 cat_value_to_binary(X) -> binary_to_float(X).
 
 %% @hidden
