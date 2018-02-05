@@ -74,7 +74,7 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 									 "&x=3",
 									 "&test=1"
 								 >>;
-							  _->
+							 _ ->
 								 <<
 									 "bidid=", BidId/binary,
 									 "&c=", Cmp/binary,
@@ -83,10 +83,10 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 									 "&ts=", TsBinary/binary
 								 >>
 						 end,
-			BRId = tk_maps:get([<<"id">>],RSP0),
+			BRId = tk_maps:get([<<"id">>], RSP0),
 			NurlPath = list_to_binary(?NURL_PATH),
 			Nurl1 = <<NurlPath/binary, BidderAttr/binary>>,
-			Nurl2 = binary:replace(?ADX03_NURL	, <<"{{nurl_path}}">>, Nurl1),
+			Nurl2 = binary:replace(?ADX03_NURL, <<"{{nurl_path}}">>, Nurl1),
 			AdmUrl1 = tk_maps:get([<<"creative">>, <<"adm_url">>], RSP0),
 			AdmUrl2 = tk_lib:escape_uri(<<AdmUrl1/binary, "?", BidderAttr/binary>>),
 			AdmUrl3 = <<?ADX03_PRE_ADM/binary, AdmUrl2/binary>>,
@@ -110,7 +110,7 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 								<<"price">> => Price,
 								<<"h">> => Height,
 								<<"w">> => Width,
- 								<<"adid">> => Crid,
+								<<"adid">> => Crid,
 								<<"adm">> => Adm2,
 								<<"adomain">> => [tk_maps:get([<<"creative">>, <<"adomain">>], RSP0)],
 								<<"cid">> => ?ADX03_BILLING_ID,
@@ -156,18 +156,18 @@ parse_device(Path, BR) ->
 	case find(Path, BR, ignore) of
 		ignore ->
 			#{
-				<<"type">> => [2,4,5]
+				<<"type">> => [2, 4, 5]
 			};
 		Device ->
-			Type = find([<<"devicetype">>], Device, [2,4,5]),
+			Type = find([<<"devicetype">>], Device, [2, 4, 5]),
 			Model = find([<<"model">>], Device, <<"">>),
 			Make = find([<<"make">>], Device, <<"">>),
 			Os0 = find([<<"os">>], Device, <<"">>),
 			Ua0 = find([<<"ua">>], Device, <<"">>),
 			Ua1 = list_binary_match(Ua0, ?DEVICE_UA, <<"">>),
 			Os1 = case lists:member(Os0, ?DEVICE_OS) of
-					 true -> Os0;
-					 false -> <<"">>
+					  true -> Os0;
+					  false -> <<"">>
 				  end,
 			#{
 				<<"type">> => Type,
@@ -225,6 +225,20 @@ parse_user(Path, BR) ->
 	end.
 
 -spec parse_cat(map_path() | [map_path()], br()) -> list().
+parse_cat([], BR) ->
+	CatPaths = [
+		[<<"app">>, <<"cat">>],
+		[<<"app">>, <<"pagecat">>],
+		[<<"app">>, <<"sectioncat">>],
+		[<<"app">>, <<"content">>, <<"cat">>],
+		[<<"site">>, <<"cat">>],
+		[<<"site">>, <<"pagecat">>],
+		[<<"site">>, <<"sectioncat">>],
+		[<<"app">>, <<"content">>, <<"cat">>]
+	],
+	Cat1 = parse_google_cat(BR),
+	Cat2 = [get_cat_root(Cat) || Cat <- Cat1] ++ Cat1,
+	lists:usort(lists:merge(parse_cat(CatPaths, BR), Cat2));
 parse_cat([H | _] = Path, BR) when is_binary(H) ->
 	Cat1 = find(Path, BR, []),
 	Cat2 = [get_cat_root(Cat) || Cat <- Cat1],
@@ -283,6 +297,7 @@ parse_imp2(banner, Value) ->
 	Dims2 = lists:usort(Dims1 ++ parse_formats(Formats)),
 	Btype = find(<<"btype">>, Value, []),
 	Battr = find(<<"battr">>, Value, []),
+	Metric = find(<<"metric">>, Value, []),
 	Pos = find(<<"pos">>, Value, 0),
 	Expdir = find(<<"expdir">>, Value, 0),
 	#{
@@ -291,7 +306,8 @@ parse_imp2(banner, Value) ->
 		<<"battr">> => Battr,
 		<<"btype">> => Btype,
 		<<"pos">> => Pos,
-		<<"expdir">> => Expdir
+		<<"expdir">> => Expdir,
+		<<"metric">> => Metric
 	};
 parse_imp2(_, _) ->
 	invalid.
@@ -306,6 +322,29 @@ parse_formats([Format | T], Acc) ->
 	H2 = find(<<"h">>, Format, 0),
 	parse_formats(T, Acc ++ set_creative_dimensions(W2, H2)).
 
+
+%% @hidden
+parse_google_cat(BR) ->
+	case find([<<"user">>, <<"data">>], BR, []) of
+		[] -> [];
+		Data ->
+			[H | _] = Data,
+			Segments = tk_maps:get([<<"segment">>], H),
+			lists:foldl(
+				fun(SegMap, AccIn) ->
+					CatId = tk_maps:get([<<"id">>], SegMap),
+					Value = cat_value_to_binary(tk_maps:get([<<"value">>], SegMap)),
+					case Value of
+						V when V >= 0.2 ->
+							case try_ets_lookup(google_to_iab, CatId, undefined) of
+								undefined -> AccIn;
+								Cat -> AccIn ++ Cat
+							end;
+						_ -> AccIn
+					end
+				end,
+				[], Segments)
+	end.
 
 %% @hidden
 list_binary_match(Subject, ListOfPatterns, Default) ->
@@ -331,23 +370,18 @@ get_cat_root(Cat) ->
 	C.
 
 %% @hidden
+cat_value_to_binary(<<"0">>) -> 0;
+cat_value_to_binary(<<"1">>) -> 1;
+cat_value_to_binary(X) -> binary_to_float(X).
+
+%% @hidden
 openrtb_parser() ->
 	[
 		{<<"id">>, {find, invalid}, [<<"id">>]},
 		{<<"test">>, {find, 0}, [<<"test">>]},
 		{<<"geo">>, parse_geo, [<<"device">>, <<"geo">>]},
 		{<<"bcat">>, parse_cat, [<<"bcat">>]},
-		{<<"cat">>, parse_cat, [
-			[<<"app">>, <<"cat">>],
-			[<<"app">>, <<"pagecat">>],
-			[<<"app">>, <<"sectioncat">>],
-			[<<"app">>, <<"content">>, <<"cat">>],
-			[<<"site">>, <<"cat">>],
-			[<<"site">>, <<"pagecat">>],
-			[<<"site">>, <<"sectioncat">>],
-			[<<"app">>, <<"content">>, <<"cat">>]
-		]},
-		{<<"metric">>, {find, []}, [<<"metric">>]},
+		{<<"cat">>, parse_cat, []},
 		{<<"ip">>, {find, <<"">>}, [<<"device">>, <<"ip">>]},
 		{<<"badv">>, {find, []}, [<<"badv">>]},
 		{<<"bapp">>, {find, []}, [<<"bapp">>]},
