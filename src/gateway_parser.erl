@@ -393,7 +393,7 @@ openrtb_parser() ->
 		{<<"id">>, {find, invalid}, [<<"id">>]},
 		{<<"test">>, {find, 0}, [<<"test">>]},
 		{<<"geo">>, parse_geo, [<<"device">>, <<"geo">>]},
-		{<<"bcat">>, {find, []s}, [<<"bcat">>]},
+		{<<"bcat">>, {find, []}, [<<"bcat">>]},
 		{<<"cat">>, parse_cat, []},
 		{<<"ip">>, {find, <<"">>}, [<<"device">>, <<"ip">>]},
 		{<<"badv">>, {find, []}, [<<"badv">>]},
