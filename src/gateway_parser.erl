@@ -90,13 +90,14 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 			AdmUrl1 = tk_maps:get([<<"creative">>, <<"adm_url">>], RSP0),
 			AdmUrl2 = tk_lib:escape_uri(<<AdmUrl1/binary, "?", BidderAttr/binary>>),
 			AdmUrl3 = <<?ADX03_PRE_ADM/binary, AdmUrl2/binary>>,
-			Adm1 = case tk_maps:get([<<"creative">>, <<"class">>], RSP0) of
+			Adm = case tk_maps:get([<<"creative">>, <<"class">>], RSP0) of
 					   <<"html5">> ->
-						   tk_maps:get([<<"creative">>, <<"adm_iframe">>], RSP0);
+						   Adm0 = tk_maps:get([<<"creative">>, <<"adm_iframe">>], RSP0),
+						   binary:replace(Adm0 , <<"{{ADM_URL}}">>, <<"&ct=", AdmUrl3>>);
 					   _ ->
-						   tk_maps:get([<<"creative">>, <<"adm">>], RSP0)
+						   Adm0 = tk_maps:get([<<"creative">>, <<"adm">>], RSP0),
+						   binary:replace(Adm0 , <<"{{ADM_URL}}">>, AdmUrl3)
 				   end,
-			Adm2 = binary:replace(Adm1, <<"{{ADM_URL}}">>, AdmUrl3),
 			ImpId = tk_maps:get([<<"creative">>, <<"impid">>], RSP0),
 			Height = tk_maps:get([<<"creative">>, <<"h">>], RSP0),
 			Width = tk_maps:get([<<"creative">>, <<"w">>], RSP0),
@@ -116,7 +117,7 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 								<<"h">> => Height,
 								<<"w">> => Width,
 								<<"adid">> => Crid,
-								<<"adm">> => Adm2,
+								<<"adm">> => Adm,
 								<<"adomain">> => [tk_maps:get([<<"creative">>, <<"adomain">>], RSP0)],
 								<<"cid">> => ?ADX03_BILLING_ID,
 								<<"crid">> => Crid,
