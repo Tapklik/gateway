@@ -25,6 +25,7 @@
 -define(ADX03_SEAT, <<"244977050">>).
 -define(ADX03_BILLING_ID, <<"49634885883">>).
 -define(ADX03_PRE_ADM, <<"%%CLICK_URL_UNESC%%">>).
+-define(ADX03_PRE_ADM_ESC, <<"%%CLICK_URL_ESC%%">>).
 -define(ADX03_POST_ADM, <<"">>).
 -define(ADX03_RSP_HEADERS,
 	#{
