@@ -80,10 +80,11 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 								 >>
 						 end,
 			BRId = tk_maps:get([<<"id">>], RSP0),
+			AdServer = ?ADSERVER_PATH,
 
-			Nurl = <<?ADSERVER_PATH/binary, "/wins/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary, ?ADX03_NURL/binary>>,
-			ImpPath = <<?ADSERVER_PATH/binary, "/butler/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary>>,
-			AdmUrl1 = <<?ADSERVER_PATH/binary, "/link/", Crid/binary, "/", Cmp/binary>>,
+			Nurl = <<AdServer/binary, "/wins/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary, ?ADX03_NURL/binary>>,
+			ImpPath = <<AdServer/binary, "/butler/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary>>,
+			AdmUrl1 = <<AdServer/binary, "/link/", Crid/binary, "/", Cmp/binary>>,
 			AdmUrl2 = tk_lib:escape_uri(<<AdmUrl1/binary, "?", BidderAttr/binary>>),
 			Adm = case tk_maps:get([<<"creative">>, <<"class">>], RSP0) of
 					  <<"html5">> ->
