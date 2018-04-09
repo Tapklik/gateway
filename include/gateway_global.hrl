@@ -10,8 +10,8 @@
 -define(DATA_PATH, "./data/"). %% Add the trailing "/"
 -define(YEAR, 2018).
 
--define(NURL_PATH,
-	application:get_env(gateway, nurl_host, "http://localhost:2250") ++ "/sad23ref34578hj/wins?"). %% Add the trailing "/"
+-define(ADSERVER_PATH,
+	application:get_env(gateway, adserver, <<"http://localhost:2250/">>)). %% Add the trailing "/"
 
 -define(APPLICATION, gateway).
 	-define(ENV(Key), application:get_env(?APPLICATION, Key, [])).
@@ -21,7 +21,7 @@
 
 %% ADX COWBOY SETTINGS
 -define(ADX03_ID, 3).
--define(ADX03_NURL, <<"{{nurl_path}}&wp=${AUCTION_PRICE}">>).
+-define(ADX03_NURL, <<"&wp=${AUCTION_PRICE}">>).
 -define(ADX03_SEAT, <<"244977050">>).
 -define(ADX03_BILLING_ID, <<"49634885883">>).
 -define(ADX03_PRE_ADM, <<"%%CLICK_URL_UNESC%%">>).
