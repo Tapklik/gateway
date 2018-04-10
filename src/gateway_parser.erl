@@ -83,10 +83,11 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 			AdServer = ?ADSERVER_PATH,
 
 			Nurl = <<AdServer/binary, "/wins/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary, ?ADX03_NURL/binary>>,
-			AdmUrl1 = <<AdServer/binary, "/link/", Crid/binary, "/", Cmp/binary>>,
-			AdmUrl2 = tk_lib:escape_uri(<<AdmUrl1/binary, "?", BidderAttr/binary>>),
+
 			Adm = case tk_maps:get([<<"creative">>, <<"class">>], RSP0) of
 					  <<"html5">> ->
+						  AdmUrl1 = <<AdServer/binary, "/link/h/", Crid/binary, "/", Cmp/binary>>,
+						  AdmUrl2 = tk_lib:escape_uri(<<AdmUrl1/binary, "?", BidderAttr/binary>>),
 						  AdmUrl3 = tk_lib:escape_uri(AdmUrl2),
 						  AdmUrl4 = <<?ADX03_PRE_ADM_ESC/binary, AdmUrl3/binary>>,
 						  Adm0 = tk_maps:get([<<"creative">>, <<"adm_iframe">>], RSP0),
@@ -94,6 +95,8 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 						  A1 = binary:replace(Adm0, <<"{{ADM_URL}}">>, <<"ct=", AdmUrl4/binary>>),
 						  binary:replace(A1, <<"{{IMP_PATH}}">>, ImpPath);
 					  <<"banner">> ->
+						  AdmUrl1 = <<AdServer/binary, "/link/i/", Crid/binary, "/", Cmp/binary>>,
+						  AdmUrl2 = tk_lib:escape_uri(<<AdmUrl1/binary, "?", BidderAttr/binary>>),
 						  AdmUrl3 = <<?ADX03_PRE_ADM/binary, AdmUrl2/binary>>,
 						  Adm0 = tk_maps:get([<<"creative">>, <<"adm">>], RSP0),
 						  A1 = binary:replace(Adm0, <<"{{ADM_URL}}">>, AdmUrl3),
