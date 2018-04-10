@@ -83,7 +83,6 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 			AdServer = ?ADSERVER_PATH,
 
 			Nurl = <<AdServer/binary, "/wins/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary, ?ADX03_NURL/binary>>,
-			ImpPath = <<AdServer/binary, "/butler/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary>>,
 			AdmUrl1 = <<AdServer/binary, "/link/", Crid/binary, "/", Cmp/binary>>,
 			AdmUrl2 = tk_lib:escape_uri(<<AdmUrl1/binary, "?", BidderAttr/binary>>),
 			Adm = case tk_maps:get([<<"creative">>, <<"class">>], RSP0) of
@@ -91,12 +90,17 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 						  AdmUrl3 = tk_lib:escape_uri(AdmUrl2),
 						  AdmUrl4 = <<?ADX03_PRE_ADM_ESC/binary, AdmUrl3/binary>>,
 						  Adm0 = tk_maps:get([<<"creative">>, <<"adm_iframe">>], RSP0),
-						  binary:replace(Adm0, <<"{{ADM_URL}}">>, <<"ct=", AdmUrl4/binary>>);
-					  _ ->
+						  ImpPath = <<AdServer/binary, "/butler/h/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary>>,
+						  A1 = binary:replace(Adm0, <<"{{ADM_URL}}">>, <<"ct=", AdmUrl4/binary>>),
+						  binary:replace(A1, <<"{{IMP_PATH}}">>, ImpPath);
+					  <<"banner">> ->
 						  AdmUrl3 = <<?ADX03_PRE_ADM/binary, AdmUrl2/binary>>,
 						  Adm0 = tk_maps:get([<<"creative">>, <<"adm">>], RSP0),
 						  A1 = binary:replace(Adm0, <<"{{ADM_URL}}">>, AdmUrl3),
-						  binary:replace(A1, <<"{{IMP_PATH}}">>, ImpPath)
+						  ImpPath = <<AdServer/binary, "/butler/i/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary>>,
+						  binary:replace(A1, <<"{{IMP_PATH}}">>, ImpPath);
+				  	_ ->
+						?ERROR("GATEWAY REPORTS: Unsupported format!", [])
 				  end,
 			ImpId = tk_maps:get([<<"creative">>, <<"impid">>], RSP0),
 			Height = tk_maps:get([<<"creative">>, <<"h">>], RSP0),
