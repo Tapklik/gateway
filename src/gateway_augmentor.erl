@@ -1,6 +1,6 @@
 -module(gateway_augmentor).
 
--include("gateway_global.hrl").
+-include("global.hrl").
 -include("lager.hrl").
 -include_lib("stdlib/include/ms_transform.hrl").
 

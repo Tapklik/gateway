@@ -2,7 +2,7 @@
 
 -export([init/2, info/3]).
 
--include("gateway_global.hrl").
+-include("global.hrl").
 -include("lager.hrl").
 
 -record(state, {

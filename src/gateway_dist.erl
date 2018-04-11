@@ -2,7 +2,7 @@
 
 -behaviour(gen_server).
 
--include("gateway_global.hrl").
+-include("global.hrl").
 -include("lager.hrl").
 
 

@@ -1,6 +1,6 @@
 -module(gateway_bids_handler).
 
--include("gateway_global.hrl").
+-include("global.hrl").
 -include("lager.hrl").
 
 

@@ -1,6 +1,6 @@
 -module(gateway_parser).
 
--include("gateway_global.hrl").
+-include("global.hrl").
 -include("lager.hrl").
 -include_lib("stdlib/include/ms_transform.hrl").
 -include("gateway_parser.hrl").
@@ -95,11 +95,12 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 						  A1 = binary:replace(Adm0, <<"{{ADM_URL}}">>, <<"ct=", AdmUrl4/binary>>),
 						  binary:replace(A1, <<"{{IMP_PATH}}">>, ImpPath);
 					  <<"banner">> ->
-						  AdmUrl1 = <<AdServer/binary, "/link/i/", Crid/binary, "/", Cmp/binary>>,
-						  AdmUrl2 = tk_lib:escape_uri(<<AdmUrl1/binary, "?", BidderAttr/binary>>),
-						  AdmUrl3 = <<?ADX03_PRE_ADM/binary, AdmUrl2/binary>>,
+						  AdmUrl1 = <<AdServer/binary, "/link/i/", Crid/binary, "/", Cmp/binary,
+							  "?", BidderAttr/binary, "&r=", ?ADX03_POST_ADM/binary>>,
+%%						  AdmUrl2 = tk_lib:escape_uri(<<AdmUrl1/binary, "?", BidderAttr/binary>>),
+%%						  AdmUrl3 = <<?ADX03_PRE_ADM/binary, AdmUrl2/binary>>,
 						  Adm0 = tk_maps:get([<<"creative">>, <<"adm">>], RSP0),
-						  A1 = binary:replace(Adm0, <<"{{ADM_URL}}">>, AdmUrl3),
+						  A1 = binary:replace(Adm0, <<"{{ADM_URL}}">>, AdmUrl1),
 						  ImpPath = <<AdServer/binary, "/butler/i/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary>>,
 						  binary:replace(A1, <<"{{IMP_PATH}}">>, ImpPath);
 				  	_ ->

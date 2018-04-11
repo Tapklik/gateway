@@ -2,7 +2,7 @@
 
 -behaviour(application).
 
--include("gateway_global.hrl").
+-include("global.hrl").
 -include("lager.hrl").
 -include("rmq.hrl").
 
