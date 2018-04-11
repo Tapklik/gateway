@@ -2,6 +2,7 @@
 
 -behaviour(gen_server).
 
+-include("global.hrl").
 -include("rmq.hrl").
 -include("lager.hrl").
 -include_lib("../lib/amqp_client/include/amqp_client.hrl").
