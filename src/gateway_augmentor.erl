@@ -36,4 +36,4 @@ augment_br(BR0) ->
 calc_hour_of_week() ->
 	T = time_server:get_timestamp(),
 	{Today, {H, _M, _S}} = time_server:timestamp_to_datetime(T),
-	24 * (calendar:day_of_the_week(Today) - 1) + H.
+	24 * (calendar:day_of_the_week(Today) - 1) + H + 1.

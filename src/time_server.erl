@@ -7,7 +7,8 @@
 
 -export([
 	start_link/0,
-	get_time/0, get_timestamp/0, get_iso_time/0,
+	get_time/0, get_timestamp/0, get_time/1, get_timestamp/1,
+	get_iso_time/0, get_datehour/0,
 	reset_start_time/0, set_start_time/1,
 	datetime_to_timestamp/1, timestamp_to_datetime/1
 ]).
@@ -32,15 +33,28 @@
 start_link() ->
 	gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
+
 get_time() ->
+	get_time({plus, 0, 0}).
+get_time(TZ) ->
 	case try_ets_lookup(time, time_unix) of
 		not_found ->
 			?ERROR("TIME SERVER: ETS broken!", []);
-		T -> T
+		T -> shift_time(ts, T, TZ)
 	end.
 
 get_timestamp() ->
+	get_timestamp({plus, 0, 0}).
+get_timestamp(TZ) ->
 	case try_ets_lookup(time, timestamp) of
+		not_found ->
+			?ERROR("TIME SERVER: ETS broken!", []);
+		T -> shift_time(ts, T, TZ)
+	end.
+
+
+get_datehour() ->
+	case try_ets_lookup(time, datehour) of
 		not_found ->
 			?ERROR("TIME SERVER: ETS broken!", []);
 		T -> T
@@ -66,6 +80,9 @@ datetime_to_timestamp({{Year,Month,Day},{Hours,Minutes,Seconds}}) ->
 
 timestamp_to_datetime(Timestamp) ->
 	calendar:gregorian_seconds_to_datetime(trunc(Timestamp/?SEC) + 62167219200).
+
+shift_hours(Time, {Op, H, M}) ->
+	ok.
 
 
 %%%%%%%%%%%%%%%%%%%%%%
@@ -111,9 +128,8 @@ handle_cast(_Request, State) ->
 %% @private
 %%
 handle_info({init}, State) ->
-	{T1, T2, _T3} = erlang:timestamp(),
-	Time = trunc(?SEC * ((T1 * 1000000) + T2)), %% milli seconds
-	{{Year, Month, Day}, {Hour, Minute, Second}} = calendar:now_to_datetime(erlang:timestamp()),
+	Time = datetime_to_timestamp(calendar:now_to_universal_time(erlang:timestamp())), %% milli seconds
+	{{Year, Month, Day}, {Hour, Minute, Second}} = calendar:now_to_universal_time(erlang:timestamp()),
 	IsoTime = lists:flatten(io_lib:format("~4..0w-~2..0w-~2..0wT~2..0w:~2..0w:~2..0w",
 		[Year, Month, Day, Hour, Minute, Second])),
 	Time60 = Time - (Time rem (60 * ?SEC)),
@@ -122,10 +138,10 @@ handle_info({init}, State) ->
 	ets:insert(time, {time_iso, list_to_binary(IsoTime)}),
 	ets:insert(time, {time_unix_min, Time60}),
 	ets:insert(time, {timestamp, Time300}),
+	ets:insert(time, {datehour, {Year, Month, Day, Hour}}),
 	erlang:send_after(?INTERVAL, self(), {interval}),
 	{noreply, State#state{starting_time = Time60}};
 handle_info({interval}, State) ->
-	{T1, T2, _T3} = erlang:timestamp(),
 	Time0 = State#state.time,
 	TimeScale = case ?TIME_SCALE of
 					undefined -> 1;
@@ -133,10 +149,10 @@ handle_info({interval}, State) ->
 				end,
 	Time = case TimeScale of
 			   1 ->
-				   trunc(?SEC * ((T1 * 1000000) + T2));
+				   datetime_to_timestamp(calendar:now_to_universal_time(erlang:timestamp()));
 			   _ ->
 				   StartingTime = State#state.starting_time,
-				   T = trunc(?SEC * ((T1 * 1000000) + T2)),
+				   T = datetime_to_timestamp(calendar:now_to_universal_time(erlang:timestamp())),
 				   StartingTime + (T - StartingTime) * TimeScale
 		   end,
 	case Time == Time0 of
@@ -162,6 +178,9 @@ handle_info({interval}, State) ->
 			IsoTime = lists:flatten(io_lib:format("~4..0w-~2..0w-~2..0wT~2..0w:~2..0w:~2..0w",
 				[Year, Month, Day, Hour, Minute, Second])),
 			ets:insert(time, {time_iso, list_to_binary(IsoTime)}),
+
+			%% Date hour
+			ets:insert(time, {datehour, {Year, Month, Day, Hour}}),
 
 			%% Unix Time (minutes)
 			case Time rem (60 * ?SEC) of
@@ -198,6 +217,17 @@ unix_to_erlang_timestamp(U) ->
 	T1 = trunc(U/1000000),
 	T2 = U - (T1 * 1000000),
 	{T1, T2, 0}.
+
+
+shift_time(ts, Ts, {Op, HShift, MShift}) ->
+	Diff = (HShift * 3600) + (MShift * 60),
+	case Op of
+		plus ->
+			Ts + Diff;
+		minus ->
+			Ts - Diff
+	end.
+
 
 try_ets_lookup(Table, Key) ->
 	try_ets_lookup(Table, Key, not_found).
