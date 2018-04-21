@@ -110,11 +110,11 @@ loop(Parent, Debug, State) ->
 					exchange = Exchange, timestamp = TimeStamp, statsderl_prefix = Prefix});
 
 	%% Receiving response from bidders; positive response is a map always
-		{_From, rsp, BidId, RSPmap0} when is_map(RSPmap0) ->
+		{Bidder, rsp, BidId, RSPmap0} when is_map(RSPmap0) ->
 			Exchange = State#state.exchange,
 			DebugBid = State#state.debug,
 			TimeStamp = State#state.timestamp,
-			RSPmap1 = gateway_parser:parse_rsp(Exchange, BidId, RSPmap0, TimeStamp),
+			RSPmap1 = gateway_parser:parse_rsp(Exchange, Bidder, BidId, RSPmap0, TimeStamp),
 			RSPTime = calc_time(State#state.t1),
 			%% Log bid if DebugBid = true (should be compiled with debug enabled)
 			log_bid(BidId, [{<<"rsp">>, RSPmap1}, {<<"rsp_time">>, RSPTime}], DebugBid),
@@ -122,7 +122,7 @@ loop(Parent, Debug, State) ->
 			State#state.from ! {rsp, BidId, RSPmap1};
 
 	%% Receiving response from bidders; Other can be: invalid_br, invalid_rsp, timeout
-		{_From, rsp, BidId, Other} ->
+		{Bidder, rsp, BidId, Other} ->
 			Exchange = State#state.exchange,
 			DebugBid = State#state.debug,
 			RSPTime = calc_time(State#state.t1),

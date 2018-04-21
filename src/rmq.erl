@@ -8,7 +8,7 @@
 -include_lib("../lib/amqp_client/include/amqp_client.hrl").
 
 -export([start_link/0, start_link/1, start_subscriber/1, start_publisher/1]).
--export([publish/2]).
+-export([publish/2, publish/3]).
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 	terminate/2, code_change/3]).
@@ -48,19 +48,14 @@ start_publisher(#publisher{name = Name, pool_size = PoolSize} = Publisher) ->
 	end.
 
 publish(PublisherName, Msg) ->
+	publish(PublisherName, default, Msg).
+publish(PublisherName, Topic, Msg) ->
 	case try_ets_lookup(rmq_publishers, PublisherName) of
 		not_found ->
 			?ERROR("RMQ: Error in publishing to RMQ server. Publisher pool ( ~p ) not found! ~n (Msg: ~p)",
-				[shorten_log_output(Msg)]);
+				[PublisherName, shorten_log_output(Msg)]);
 		_ ->
-			Worker = pooler:take_member(PublisherName),
-			case Worker of
-				error_no_members ->
-					?WARN("POOLER (~p): No members available! Retrying [1/3]... ", [PublisherName]),
-					try_publish(PublisherName, Msg);
-				W ->
-					gen_server:cast(W, {publish, Msg})
-			end
+			try_publish(PublisherName, Topic, Msg)
 	end.
 
 %%%%%%%%%%%%%%%%%%%%%%
@@ -84,9 +79,13 @@ init([Args]) ->
 handle_call(check_health, _From, State) ->
 	{reply, ok, State}.
 
-handle_cast({publish, Payload}, State) ->
+handle_cast({publish, Topic0, Payload}, State) ->
 	Channel = State#state.channel,
-	#publisher{name = Name, exchange = Exchange, topic = Topic} = State#state.publisher,
+	#publisher{name = Name, exchange = Exchange, topic = TopicFromWorker} = State#state.publisher,
+	Topic = case Topic0 of
+				default -> TopicFromWorker;
+				T -> T
+			end,
 	case amqp_channel:call(State#state.channel, #'basic.publish'{
 		exchange = Exchange,
 		routing_key = Topic
@@ -108,12 +107,13 @@ handle_cast({publish, Payload}, State) ->
 handle_cast(_Msg, State) ->
 	{noreply, State}.
 
-handle_info({init, #subscriber{exchange = Exchange, topic = Topic,
+handle_info({init, #subscriber{exchange = Exchange, topic = Topic0,
 	name = Name, logging = Logging} = Subscriber}, State) ->
+	Topic = get_topic(Topic0),
 	Channel = State#state.channel,
 	Queue = generate_queue_id(Name),
 	#'queue.declare_ok'{} = amqp_channel:call(Channel, #'queue.declare'{exclusive = false,
-		queue = Queue, arguments = [{<<"x-max-length">>, long, 10}]}),
+		queue = Queue}),
 	amqp_channel:call(Channel, #'queue.bind'{exchange = Exchange, routing_key = Topic,
 		queue = Queue}),
 	amqp_channel:subscribe(Channel, #'basic.consume'{queue = Queue,
@@ -122,7 +122,8 @@ handle_info({init, #subscriber{exchange = Exchange, topic = Topic,
 		[Name, Channel, Exchange, Topic]),
 	{noreply, State#state{subscriber = Subscriber, logging = Logging}};
 
-handle_info({init, #publisher{name= Name, exchange = Exchange, topic = Topic, logging = Logging} = Publisher}, State) ->
+handle_info({init, #publisher{name= Name, exchange = Exchange, topic = Topic0, logging = Logging} = Publisher}, State) ->
+	Topic = get_topic(Topic0),
 	?INFO("RMQ: Started publisher: ~p ~n (Channel: ~p. Exchange: ~p. Topic: ~p)",
 		[Name, State#state.channel, Exchange, Topic]),
 	{noreply, State#state{publisher = Publisher, logging = Logging}};
@@ -167,10 +168,10 @@ code_change(_OldVsn, State, _Extra) ->
 %%%    INTERNAL    %%%
 %%%%%%%%%%%%%%%%%%%%%%
 
-try_publish(PublisherName, Msg) ->
-	try_publish(PublisherName, Msg, 1).
+try_publish(PublisherName, Topic, Msg) ->
+	try_publish(PublisherName, Topic, Msg, 1).
 
-try_publish(PublisherName, Msg, Count) ->
+try_publish(PublisherName, Topic, Msg, Count) ->
 	NewCount = Count + 1,
 	timer:sleep(20),
 	Worker = pooler:take_member(PublisherName),
@@ -180,10 +181,14 @@ try_publish(PublisherName, Msg, Count) ->
 			?ERROR("RMQ: Msg ~p on publisher ~p was not published!", [shorten_log_output(Msg), PublisherName]);
 		error_no_members ->
 			?WARN("POOLER (~p): No members available! Retrying [~p/3]... ", [PublisherName, NewCount]),
-			try_publish(PublisherName, Msg, NewCount);
+			try_publish(PublisherName, Topic, Msg, NewCount);
 		W ->
-			gen_server:cast(W, {publish, Msg})
+			gen_server:cast(W, {publish, Topic, Msg})
 	end.
+
+get_topic(Topic0) ->
+	BidderId = list_to_binary(?ENV(app_id, "")),
+	binary:replace(Topic0, <<"{id}">>, BidderId).
 
 generate_queue_id(Name) ->
 	case try_ets_lookup(rmq_queues, Name) of

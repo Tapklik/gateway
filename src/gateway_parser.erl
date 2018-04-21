@@ -5,7 +5,7 @@
 -include_lib("stdlib/include/ms_transform.hrl").
 -include("gateway_parser.hrl").
 
--export([parse_br/1, parse_rsp/4]).
+-export([parse_br/1, parse_rsp/5]).
 
 -export([
 	parse_geo/2,
@@ -56,8 +56,8 @@ parse_br([{Parameter, Fun, Args} | T], BR, BRmap) ->
 			 end,
 	parse_br(T, BR, BRmap2).
 
--spec parse_rsp(binary(), binary(), rsp(), integer()) -> rsp().
-parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
+-spec parse_rsp(binary(), binary(), binary(), rsp(), integer()) -> rsp().
+parse_rsp(Exchange, Bidder, BidId, RSP0, TimeStamp) ->
 	Cmp = tk_maps:get([<<"cid">>], RSP0),
 	Crid = tk_maps:get([<<"creative">>, <<"crid">>], RSP0),
 	case Exchange of
@@ -70,12 +70,14 @@ parse_rsp(Exchange, BidId, RSP0, TimeStamp) ->
 									 "b=", BidId/binary,
 									 "&ts=", TsBinary/binary,
 									 "&x=3",
+									 "&adr=", Bidder/binary,
 									 "&test=1"
 								 >>;
 							 _ ->
 								 <<
 									 "b=", BidId/binary,
 									 "&x=3",
+									 "&adr=", Bidder/binary,
 									 "&ts=", TsBinary/binary
 								 >>
 						 end,
