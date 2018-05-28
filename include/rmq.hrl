@@ -26,7 +26,7 @@
 -define(RMQ_PASSWORD, <<"tapKlik7-rabbitmq">>).
 -define(RMQ_VHOST, <<"/erl">>).
 
--define(RMQ_X_MESSAGE_TTL, 60).
+-define(RMQ_X_MESSAGE_TTL, 60000).
 
 
 %% RABBITMQ PUBSUB SUBSCRIBERS AND PUBLISHERS
