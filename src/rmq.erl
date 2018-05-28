@@ -187,7 +187,7 @@ try_publish(PublisherName, Topic, Msg, Count) ->
 	end.
 
 get_topic(Topic0) ->
-	BidderId = ?ENV(app_id, ""),
+	BidderId = ?ENV(app_id, <<"">>),
 	binary:replace(Topic0, <<"{id}">>, BidderId).
 
 generate_queue_id(Name) ->
