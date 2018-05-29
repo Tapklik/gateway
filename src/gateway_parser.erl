@@ -218,7 +218,7 @@ parse_imp(Path, BR) ->
 			Bidfloor = find(<<"bidfloor">>, Imp, 0.0),
 			Instl = find(<<"instl">>, Value, 0),
 			ImpId = find(<<"id">>, Value, <<"1">>),
-			Metric = find(<<"metric">>, Value, []),
+			Metric = find(<<"metric">>, Imp, []),
 			ParsedImp1#{
 				<<"bidfloor">> => Bidfloor,
 				<<"instl">> => Instl,
