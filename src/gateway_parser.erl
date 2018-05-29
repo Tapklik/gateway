@@ -162,12 +162,7 @@ parse_geo(Path, BR) ->
 							 R ->
 								 try_ets_lookup(regions, <<Country/binary, "-", R/binary>>)
 						 end,
-			City = case find([<<"city">>], Geo, <<"">>) of
-							 <<"">> ->
-								 <<"">>;
-							 C ->
-								 try_ets_lookup(regions, <<Country/binary, "-", C/binary>>)
-						 end,
+			City = find([<<"city">>], Geo, <<"">>),
 			#{
 				<<"country">> => Country,
 				<<"region">> => Region,
