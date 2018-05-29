@@ -153,16 +153,29 @@ parse_geo(Path, BR) ->
 		invalid -> invalid;
 		Country ->
 			Region = find([<<"region">>], Geo, <<"">>),
+			Lon = find([<<"lon">>], Geo, 0.00),
+			Lat = find([<<"lat">>], Geo, 0.00),
+			UTCoffset = find([<<"utcoffset">>], Geo, 0.00),
 			RegionName = case Region of
-							 <<"">> -> <<"">>;
-							 R -> try_ets_lookup(regions, <<Country/binary, "-", R/binary>>)
+							 <<"">> ->
+								 <<"">>;
+							 R ->
+								 try_ets_lookup(regions, <<Country/binary, "-", R/binary>>)
 						 end,
-			City = find([<<"city">>], Geo, <<"">>),
+			City = case find([<<"city">>], Geo, <<"">>) of
+							 <<"">> ->
+								 <<"">>;
+							 C ->
+								 try_ets_lookup(regions, <<Country/binary, "-", C/binary>>)
+						 end,
 			#{
 				<<"country">> => Country,
 				<<"region">> => Region,
 				<<"regionname">> => RegionName,
-				<<"city">> => City
+				<<"city">> => City,
+				<<"lon">> => Lon,
+				<<"lat">> => Lat,
+				<<"utcoffset">> => UTCoffset
 			}
 	end.
 
@@ -205,10 +218,12 @@ parse_imp(Path, BR) ->
 			Bidfloor = find(<<"bidfloor">>, Imp, 0.0),
 			Instl = find(<<"instl">>, Value, 0),
 			ImpId = find(<<"id">>, Value, <<"1">>),
+			Metric = find(<<"metric">>, Value, []),
 			ParsedImp1#{
 				<<"bidfloor">> => Bidfloor,
 				<<"instl">> => Instl,
-				<<"impid">> => ImpId
+				<<"impid">> => ImpId,
+				<<"metric">> => Metric
 			}
 	end.
 
@@ -312,7 +327,6 @@ parse_imp2(banner, Value) ->
 	Dims2 = lists:usort(Dims1 ++ parse_formats(Formats)),
 	Btype = find(<<"btype">>, Value, []),
 	Battr = find(<<"battr">>, Value, []),
-	Metric = find(<<"metric">>, Value, []),
 	Pos = find(<<"pos">>, Value, 0),
 	Expdir = find(<<"expdir">>, Value, 0),
 	#{
@@ -321,8 +335,7 @@ parse_imp2(banner, Value) ->
 		<<"battr">> => Battr,
 		<<"btype">> => Btype,
 		<<"pos">> => Pos,
-		<<"expdir">> => Expdir,
-		<<"metric">> => Metric
+		<<"expdir">> => Expdir
 	};
 parse_imp2(_, _) ->
 	invalid.
@@ -363,11 +376,11 @@ parse_google_cat(BR) ->
 
 %% @hidden
 list_binary_match(Subject, ListOfPatterns, Default) ->
-	[Pattern | T] = ListOfPatterns,
+	[{Key, Pattern} | T] = ListOfPatterns,
 	case binary:match(Subject, Pattern) of
 		nomatch when T == [] -> Default;
 		nomatch -> list_binary_match(Subject, T, Default);
-		_ -> Pattern
+		_ -> Key
 	end.
 
 %% @hidden
