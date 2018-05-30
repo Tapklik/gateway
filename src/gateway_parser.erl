@@ -357,8 +357,9 @@ parse_google_cat(BR) ->
 				fun(SegMap, AccIn) ->
 					CatId = tk_maps:get([<<"id">>], SegMap),
 					Value = cat_value_to_binary(tk_maps:get([<<"value">>], SegMap)),
+					GoogleCatThreshold = ?ENV(google_cat_threshold),
 					case Value of
-						V when V >= ?ENV(google_cat_threshold) ->
+						V when V >= GoogleCatThreshold ->
 							case try_ets_lookup(google_to_iab, CatId, undefined) of
 								undefined -> AccIn;
 								Cat -> AccIn ++ Cat
