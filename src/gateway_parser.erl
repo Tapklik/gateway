@@ -93,7 +93,7 @@ parse_rsp(Exchange, Bidder, BidId, RSP0, TimeStamp) ->
 						  AdmUrl3 = <<AdmUrl2/binary, ?ADX03_CLICK_ESC_ESC/binary>>,
 						  Adm0 = tk_maps:get([<<"creative">>, <<"adm_iframe">>], RSP0),
 						  ImpPath = <<AdServer/binary, "/butler/h/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary>>,
-						  A1 = binary:replace(Adm0, <<"{{ADM_URL}}">>, <<"ct=", AdmUrl3/binary>>),
+						  A1 = binary:replace(Adm0, <<"{{ADM_URL}}">>, <<"clickTag=", AdmUrl3/binary>>),
 						  binary:replace(A1, <<"{{IMP_PATH}}">>, ImpPath);
 					  <<"banner">> ->
 						  AdmUrl1 = <<AdServer/binary, "/link/i/", Crid/binary, "/", Cmp/binary,

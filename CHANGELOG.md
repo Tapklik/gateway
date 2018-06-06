@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 - Change bids parsing to improve performance
+- Change rsp_parser &ct= to &clickTag=
 
 
 
