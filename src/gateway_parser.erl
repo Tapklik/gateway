@@ -95,7 +95,7 @@ parse_rsp(Exchange, Bidder, BidId, RSP0, TimeStamp) ->
 						  H = integer_to_binary(tk_maps:get([<<"creative">>, <<"h">>], RSP0)),
 						  W = integer_to_binary(tk_maps:get([<<"creative">>, <<"w">>], RSP0)),
 						  Html1 = <<Html0/binary, "?clickTag=%%CLICK_URL_ESC%%", ClickTagEscEsc/binary>>,
-						  GoogleClickUrlUnesc = <<"%%CLICK_URL_ESC%%">>,
+						  GoogleClickUrlUnesc = <<"%%CLICK_URL_UNESC%%">>,
 %%						  <<"<iframe src='", Html1/binary, "' marginwidth='0' marginheight='0' align='top' scrolling='no' frameborder='0'"
 %%							  , "hspace='0' vspace='0' height='", H/binary, "' width='", W/binary, "'></iframe>
 %%							  <img  width='1' height='1' style='border:0; visibility: hidden;' src='", ImpPath/binary, "'>">>;
@@ -107,7 +107,7 @@ parse_rsp(Exchange, Bidder, BidId, RSP0, TimeStamp) ->
 						  			var width = ", W/binary, ";
 						  			var height = ", H/binary, ";
 						  			var clickTag = '", ClickTag/binary, "';
-						  			var googleClick = '';
+						  			var googleClick = '", GoogleClickUrlUnesc/binary, "';
 						  			var loader_obj = {};
 										  loader_obj['width'] = width;
 										  loader_obj['height'] = height;
