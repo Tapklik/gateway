@@ -107,7 +107,7 @@ parse_rsp(Exchange, Bidder, BidId, RSP0, TimeStamp) ->
 						  			var width = ", W/binary, ";
 						  			var height = ", H/binary, ";
 						  			var clickTag = '", ClickTag/binary, "';
-						  			var googleClick = '", GoogleClickUrlUnesc/binary, "';
+						  			var googleClick = '';
 						  			var loader_obj = {};
 										  loader_obj['width'] = width;
 										  loader_obj['height'] = height;
