@@ -120,6 +120,7 @@ parse_rsp(Exchange, Bidder, BidId, RSP0, TimeStamp) ->
 										  loader_obj['expandable']['height'] = 300;
       								TK.html5.basicLoader('tapklik-ad', banner_url, loader_obj);
 						  		</script>
+						  		<img  width='1' height='1' style='border:0; visibility: hidden;' src='", ImpPath/binary, "'>
 						  ">>;
 					  <<"banner">> ->
 						  AdmUrl1 = <<AdServer/binary, "/link/i/", Crid/binary, "/", Cmp/binary,
