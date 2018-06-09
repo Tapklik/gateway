@@ -95,9 +95,35 @@ parse_rsp(Exchange, Bidder, BidId, RSP0, TimeStamp) ->
 						  H = integer_to_binary(tk_maps:get([<<"creative">>, <<"h">>], RSP0)),
 						  W = integer_to_binary(tk_maps:get([<<"creative">>, <<"w">>], RSP0)),
 						  Html1 = <<Html0/binary, "?clickTag=%%CLICK_URL_ESC%%", ClickTagEscEsc/binary>>,
-						  <<"<iframe src='", Html1/binary, "' marginwidth='0' marginheight='0' align='top' scrolling='no' frameborder='0'"
-							  , "hspace='0' vspace='0' height='", H/binary, "' width='", W/binary, "'></iframe>
-							  <img  width='1' height='1' style='border:0; visibility: hidden;' src='", ImpPath/binary, "'>">>;
+						  GoogleClickUrlUnesc = <<"%%CLICK_URL_ESC%%">>,
+%%						  <<"<iframe src='", Html1/binary, "' marginwidth='0' marginheight='0' align='top' scrolling='no' frameborder='0'"
+%%							  , "hspace='0' vspace='0' height='", H/binary, "' width='", W/binary, "'></iframe>
+%%							  <img  width='1' height='1' style='border:0; visibility: hidden;' src='", ImpPath/binary, "'>">>;
+						  <<"
+						  		<script type='text/javascript' src='https://cdn.tapklik.com/js/tapklik.basic.js'></script>
+						  		<script type='text/javascript'>
+						  			var banner_url = ", Html0/binary, ";
+						  			var width = ", W/binary, ";
+						  			var height = ", H/binary, ";
+						  			var clickTag = ", ClickTag/binary, ";
+						  			var googleClick = ", GoogleClickUrlUnesc/binary, ";
+						  			var loader_obj = {};
+										  loader_obj['width'] = width;
+										  loader_obj['height'] = height;
+										  // Click URLs
+										  loader_obj['1pclick_url'] = googleClick || '';
+										  loader_obj['click_urls'] = {};
+										  loader_obj['click_urls']['clickTAG'] = clickTag || 'http://www.example.com/redirect/clickTag/';
+
+										  // Expandable
+										  loader_obj['expandable'] = {};
+										  loader_obj['expandable']['direction'] = 'bl';
+										  loader_obj['expandable']['width'] = 600;
+										  loader_obj['expandable']['height'] = 300;
+
+      								TK.html5.basicLoader('tapklik-ad', banner_url, loader_obj);
+						  		</script>
+						  ">>;
 					  <<"banner">> ->
 						  AdmUrl1 = <<AdServer/binary, "/link/i/", Crid/binary, "/", Cmp/binary,
 							  "?", BidderAttr/binary, "&r=", ?ADX03_CLICK_ESC/binary>>,
