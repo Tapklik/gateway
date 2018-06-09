@@ -88,13 +88,16 @@ parse_rsp(Exchange, Bidder, BidId, RSP0, TimeStamp) ->
 
 			Adm = case tk_maps:get([<<"creative">>, <<"class">>], RSP0) of
 					  <<"html5">> ->
-						  AdmUrl1 = <<AdServer/binary, "/link/h/", Crid/binary, "/", Cmp/binary>>,
-						  AdmUrl2 = tk_lib:escape_uri(<<AdmUrl1/binary, "?", BidderAttr/binary, "&r=">>),
-						  AdmUrl3 = <<AdmUrl2/binary, ?ADX03_CLICK_ESC_ESC/binary>>,
-						  Adm0 = tk_maps:get([<<"creative">>, <<"adm_iframe">>], RSP0),
+						  ClickTag = <<AdServer/binary, "/link/h/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary>>,
+						  ClickTagEscEsc = tk_lib:escape_uri(tk_lib:escape_uri(ClickTag)),
 						  ImpPath = <<AdServer/binary, "/butler/h/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary>>,
-						  A1 = binary:replace(Adm0, <<"{{ADM_URL}}">>, <<"clickTag=", AdmUrl3/binary>>),
-						  binary:replace(A1, <<"{{IMP_PATH}}">>, ImpPath);
+						  Html0 = tk_maps:get([<<"creative">>, <<"html">>], RSP0),
+						  H = integer_to_binary(tk_maps:get([<<"creative">>, <<"h">>], RSP0)),
+						  W = integer_to_binary(tk_maps:get([<<"creative">>, <<"w">>], RSP0)),
+						  Html1 = <<Html0/binary, "?clickTag=%%CLICK_URL_ESC%%", ClickTagEscEsc/binary>>,
+						  <<"<iframe src='", Html1/binary, "' marginwidth='0' marginheight='0' align='top' scrolling='no' frameborder='0'"
+							  , "hspace='0' vspace='0' height='", H/binary, "' width='", W/binary, "'></iframe>
+							  <img  width='1' height='1' style='border:0; visibility: hidden;' src='", ImpPath/binary, "'>">>;
 					  <<"banner">> ->
 						  AdmUrl1 = <<AdServer/binary, "/link/i/", Crid/binary, "/", Cmp/binary,
 							  "?", BidderAttr/binary, "&r=", ?ADX03_CLICK_ESC/binary>>,
@@ -104,8 +107,8 @@ parse_rsp(Exchange, Bidder, BidId, RSP0, TimeStamp) ->
 						  A1 = binary:replace(Adm0, <<"{{ADM_URL}}">>, AdmUrl1),
 						  ImpPath = <<AdServer/binary, "/butler/i/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary>>,
 						  binary:replace(A1, <<"{{IMP_PATH}}">>, ImpPath);
-				  	_ ->
-						?ERROR("GATEWAY REPORTS: Unsupported format!", [])
+					  _ ->
+						  ?ERROR("GATEWAY REPORTS: Unsupported format!", [])
 				  end,
 			ImpId = tk_maps:get([<<"creative">>, <<"impid">>], RSP0),
 			Height = tk_maps:get([<<"creative">>, <<"h">>], RSP0),
