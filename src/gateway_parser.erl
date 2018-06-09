@@ -101,26 +101,23 @@ parse_rsp(Exchange, Bidder, BidId, RSP0, TimeStamp) ->
 %%							  <img  width='1' height='1' style='border:0; visibility: hidden;' src='", ImpPath/binary, "'>">>;
 						  <<"
 						  		<script type='text/javascript' src='https://cdn.tapklik.com/js/tapklik.basic.js'></script>
+						  		<iframe id='tapklik-ad' src='about:blank;' frameborder='0' scrolling='no'></iframe>
 						  		<script type='text/javascript'>
-						  			var banner_url = ", Html0/binary, ";
+						  			var banner_url = '", Html0/binary, "';
 						  			var width = ", W/binary, ";
 						  			var height = ", H/binary, ";
-						  			var clickTag = ", ClickTag/binary, ";
-						  			var googleClick = ", GoogleClickUrlUnesc/binary, ";
+						  			var clickTag = '", ClickTag/binary, "';dddddd
+						  			var googleClick = '", GoogleClickUrlUnesc/binary, "';
 						  			var loader_obj = {};
 										  loader_obj['width'] = width;
 										  loader_obj['height'] = height;
-										  // Click URLs
 										  loader_obj['1pclick_url'] = googleClick || '';
 										  loader_obj['click_urls'] = {};
 										  loader_obj['click_urls']['clickTAG'] = clickTag || 'http://www.example.com/redirect/clickTag/';
-
-										  // Expandable
 										  loader_obj['expandable'] = {};
 										  loader_obj['expandable']['direction'] = 'bl';
 										  loader_obj['expandable']['width'] = 600;
 										  loader_obj['expandable']['height'] = 300;
-
       								TK.html5.basicLoader('tapklik-ad', banner_url, loader_obj);
 						  		</script>
 						  ">>;
