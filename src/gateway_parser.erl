@@ -89,21 +89,17 @@ parse_rsp(Exchange, Bidder, BidId, RSP0, TimeStamp) ->
 			Adm = case tk_maps:get([<<"creative">>, <<"class">>], RSP0) of
 					  <<"html5">> ->
 						  ClickTag = <<AdServer/binary, "/link/h/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary>>,
-						  ClickTagEscEsc = tk_lib:escape_uri(tk_lib:escape_uri(ClickTag)),
-						  ImpPath = <<AdServer/binary, "/butler/h/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary>>,
-						  Html0 = tk_maps:get([<<"creative">>, <<"html">>], RSP0),
+						  % ClickTagEscEsc = tk_lib:escape_uri(tk_lib:escape_uri(ClickTag)),
+						  PixelPath = <<AdServer/binary, "/butler/h/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary>>,
+						  ImpPath = tk_maps:get([<<"creative">>, <<"html">>], RSP0),
 						  H = integer_to_binary(tk_maps:get([<<"creative">>, <<"h">>], RSP0)),
 						  W = integer_to_binary(tk_maps:get([<<"creative">>, <<"w">>], RSP0)),
-						  Html1 = <<Html0/binary, "?clickTag=%%CLICK_URL_ESC%%", ClickTagEscEsc/binary>>,
 						  GoogleClickUrlUnesc = <<"%%CLICK_URL_UNESC%%">>,
-%%						  <<"<iframe src='", Html1/binary, "' marginwidth='0' marginheight='0' align='top' scrolling='no' frameborder='0'"
-%%							  , "hspace='0' vspace='0' height='", H/binary, "' width='", W/binary, "'></iframe>
-%%							  <img  width='1' height='1' style='border:0; visibility: hidden;' src='", ImpPath/binary, "'>">>;
 						  <<"
 						  		<script type='text/javascript' src='https://cdn.tapklik.com/js/tapklik.basic.js'></script>
 						  		<iframe id='tapklik-ad' src='about:blank;' frameborder='0' scrolling='no'></iframe>
 						  		<script type='text/javascript'>
-						  			var banner_url = '", Html0/binary, "';
+						  			var banner_url = '", ImpPath/binary, "';
 						  			var width = ", W/binary, ";
 						  			var height = ", H/binary, ";
 						  			var clickTag = '", ClickTag/binary, "';
@@ -120,17 +116,28 @@ parse_rsp(Exchange, Bidder, BidId, RSP0, TimeStamp) ->
 										  loader_obj['expandable']['height'] = 300;
       								TK.html5.basicLoader('tapklik-ad', banner_url, loader_obj);
 						  		</script>
-						  		<img  width='1' height='1' style='border:0; visibility: hidden;' src='", ImpPath/binary, "'>
+						  		<img  width='1' height='1' style='border:0; visibility: hidden;' src='", PixelPath/binary, "'>
 						  ">>;
 					  <<"banner">> ->
-						  AdmUrl1 = <<AdServer/binary, "/link/i/", Crid/binary, "/", Cmp/binary,
-							  "?", BidderAttr/binary, "&r=", ?ADX03_CLICK_ESC/binary>>,
-%%						  AdmUrl2 = tk_lib:escape_uri(<<AdmUrl1/binary, "?", BidderAttr/binary>>),
-%%						  AdmUrl3 = <<?ADX03_PRE_ADM/binary, AdmUrl2/binary>>,
-						  Adm0 = tk_maps:get([<<"creative">>, <<"adm">>], RSP0),
-						  A1 = binary:replace(Adm0, <<"{{ADM_URL}}">>, AdmUrl1),
-						  ImpPath = <<AdServer/binary, "/butler/i/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary>>,
-						  binary:replace(A1, <<"{{IMP_PATH}}">>, ImpPath);
+						  ClickTag = <<AdServer/binary, "/link/i/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary>>,
+						  ClickTagEsc = tk_lib:escape_uri(ClickTag),
+						  PixelPath = <<AdServer/binary, "/butler/i/", Crid/binary, "/", Cmp/binary, "?", BidderAttr/binary>>,
+						  ImpPath = tk_maps:get([<<"creative">>, <<"path">>], RSP0),
+						  H0 = tk_maps:get([<<"creative">>, <<"h">>], RSP0),
+						  W0 = tk_maps:get([<<"creative">>, <<"w">>], RSP0),
+						  H = integer_to_binary(H0),
+						  W = integer_to_binary(W0),
+						  HCssBorderIncluded = integer_to_binary(H0 - 2),
+						  WCssBorderIncluded = integer_to_binary(W0 - 2),
+						  GoogleClickUrlUnesc = <<"%%CLICK_URL_UNESC%%">>,
+						  <<"
+						  		<a target='_blank' href='", GoogleClickUrlUnesc/binary, ClickTagEsc, "'>
+						  			<img src='", ImpPath/binary, "' width='", W/binary, "' height='",
+							  		H/binary, "' border='0' alt='' style=' _width:", WCssBorderIncluded/binary, "px; _height:",
+							  		HCssBorderIncluded/binary, "px; _overflow:hidden; border:1px solid #000000;margin:-1px;'>
+						  		</a>
+						  		<img  width='1' height='1' style='border:0; visibility: hidden;' src='", PixelPath/binary, "'>
+						  ">>;
 					  _ ->
 						  ?ERROR("GATEWAY REPORTS: Unsupported format!", [])
 				  end,
