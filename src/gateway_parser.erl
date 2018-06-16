@@ -131,7 +131,7 @@ parse_rsp(Exchange, Bidder, BidId, RSP0, TimeStamp) ->
 						  WCssBorderIncluded = integer_to_binary(W0 - 2),
 						  GoogleClickUrlUnesc = <<"%%CLICK_URL_UNESC%%">>,
 						  <<"
-						  		<a target='_blank' href='", GoogleClickUrlUnesc/binary, ClickTagEsc, "'>
+						  		<a target='_blank' href='", GoogleClickUrlUnesc/binary, ClickTagEsc/binary, "'>
 						  			<img src='", ImpPath/binary, "' width='", W/binary, "' height='",
 							  		H/binary, "' border='0' alt='' style=' _width:", WCssBorderIncluded/binary, "px; _height:",
 							  		HCssBorderIncluded/binary, "px; _overflow:hidden; border:1px solid #000000;margin:-1px;'>
