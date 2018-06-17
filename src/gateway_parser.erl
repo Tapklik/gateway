@@ -17,6 +17,7 @@
 
 -export([
 	find/3,
+	exact/3,
 	find_either/3
 ]).
 
@@ -320,6 +321,12 @@ find(Path, Map, Default) ->
 		Value -> Value
 	end.
 
+
+-spec exact(map_path(), map(), any()) -> Value :: any() | any().
+exact(_Path, _Map, Value) ->
+	Value.
+
+
 -spec find_either([{any(), map_path()}], map(), any()) -> any() | {kv, any(), any()}.
 find_either([], _Map, Default) ->
 	Default;
@@ -442,11 +449,12 @@ cat_value_to_binary(X) -> binary_to_float(X).
 
 %% @hidden
 openrtb_parser() ->
+	% TODO: Return bcat to 	{<<"bcat">>, {find, []}, [<<"bcat">>]}
 	[
 		{<<"id">>, {find, invalid}, [<<"id">>]},
 		{<<"test">>, {find, 0}, [<<"test">>]},
 		{<<"geo">>, parse_geo, [<<"device">>, <<"geo">>]},
-		{<<"bcat">>, {find, []}, [<<"bcat">>]},
+		{<<"bcat">>, {exact, []}, [<<"bcat">>]},
 		{<<"cat">>, parse_cat, []},
 		{<<"ip">>, {find, <<"">>}, [<<"device">>, <<"ip">>]},
 		{<<"badv">>, {find, []}, [<<"badv">>]},
