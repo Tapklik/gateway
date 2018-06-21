@@ -128,16 +128,16 @@ parse_rsp(Exchange, Bidder, BidId, RSP0, TimeStamp) ->
 						  W0 = tk_maps:get([<<"creative">>, <<"w">>], RSP0),
 						  H = integer_to_binary(H0),
 						  W = integer_to_binary(W0),
-						  HCssBorderIncluded = integer_to_binary(H0 - 2),
-						  WCssBorderIncluded = integer_to_binary(W0 - 2),
+						  % HCssBorderIncluded = integer_to_binary(H0 - 2),
+						  % WCssBorderIncluded = integer_to_binary(W0 - 2),
 						  GoogleClickUrlUnesc = <<"%%CLICK_URL_UNESC%%">>,
 						  <<"
 						  		<a target='_blank' href='", GoogleClickUrlUnesc/binary, ClickTagEsc/binary, "'>
 						  			<img src='", ImpPath/binary, "' width='", W/binary, "' height='",
-							  		H/binary, "' border='0' alt='' style=' _width:", WCssBorderIncluded/binary, "px; _height:",
-							  		HCssBorderIncluded/binary, "px; _overflow:hidden; border:1px solid #000000;margin:-1px;'>
+							  		H/binary, "' border='0' alt='' style=' _width:", W/binary, "px; _height:",
+							  		H/binary, "px; _overflow:hidden;'>
 						  		</a>
-						  		<img  width='1' height='1' style='border:0; visibility: hidden;' src='", PixelPath/binary, "'>
+						  		<script src='", PixelPath/binary, "'>
 						  ">>;
 					  _ ->
 						  ?ERROR("GATEWAY REPORTS: Unsupported format!", [])
