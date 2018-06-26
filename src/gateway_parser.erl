@@ -96,7 +96,7 @@ parse_rsp(Exchange, Bidder, BidId, RSP0, TimeStamp) ->
 						  H = integer_to_binary(tk_maps:get([<<"creative">>, <<"h">>], RSP0)),
 						  W = integer_to_binary(tk_maps:get([<<"creative">>, <<"w">>], RSP0)),
 						  GoogleClickUrlUnesc = <<"%%CLICK_URL_UNESC%%">>,
-						  AdditionalParams = tk_maps:get([<<"creative">>, <<"params">>], RSP0),
+						  AdditionalParams = tk_maps:get([<<"creative">>, <<"params">>], RSP0), tk_lib:echo1(ddddd, AdditionalParams),
 						  <<"
 						  		<script type='text/javascript' src='https://cdn.tapklik.com/js/tapklik.basic.js'></script>
 						  		<iframe id='tapklik-ad' src='about:blank;' frameborder='0' scrolling='no'></iframe>
