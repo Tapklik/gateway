@@ -96,6 +96,7 @@ parse_rsp(Exchange, Bidder, BidId, RSP0, TimeStamp) ->
 						  H = integer_to_binary(tk_maps:get([<<"creative">>, <<"h">>], RSP0)),
 						  W = integer_to_binary(tk_maps:get([<<"creative">>, <<"w">>], RSP0)),
 						  GoogleClickUrlUnesc = <<"%%CLICK_URL_UNESC%%">>,
+						  AdditionalParams = tk_maps:get([<<"creative">>, <<"params">>], RSP0),
 						  <<"
 						  		<script type='text/javascript' src='https://cdn.tapklik.com/js/tapklik.basic.js'></script>
 						  		<iframe id='tapklik-ad' src='about:blank;' frameborder='0' scrolling='no'></iframe>
@@ -103,18 +104,19 @@ parse_rsp(Exchange, Bidder, BidId, RSP0, TimeStamp) ->
 						  			var banner_url = '", ImpPath/binary, "';
 						  			var width = ", W/binary, ";
 						  			var height = ", H/binary, ";
-						  			var clickTag = '", ClickTag/binary, "';
-						  			var googleClick = '", GoogleClickUrlUnesc/binary, "';
+						  			var ct = '", ClickTag/binary, "';
+						  			var gc = '", GoogleClickUrlUnesc/binary, "';
+						  			var c = '", Cmp/binary, "';
+						  			var cr = '", Crid/binary, "';
+						  			var b = '", BidId/binary, "';
+						  			var ts = '", TsBinary/binary, "';
 						  			var loader_obj = {};
 										  loader_obj['width'] = width;
 										  loader_obj['height'] = height;
-										  loader_obj['1pclick_url'] = googleClick || '';
+										  loader_obj['1pclick_url'] = gc || '';
 										  loader_obj['click_urls'] = {};
-										  loader_obj['click_urls']['clickTAG'] = clickTag || 'http://www.example.com/redirect/clickTag/';
-										  loader_obj['expandable'] = {};
-										  loader_obj['expandable']['direction'] = 'bl';
-										  loader_obj['expandable']['width'] = 600;
-										  loader_obj['expandable']['height'] = 300;
+										  loader_obj['click_urls']['clickTag'] = ct;
+										  ", AdditionalParams/binary, "
       								TK.html5.basicLoader('tapklik-ad', banner_url, loader_obj);
 						  		</script>
 						  		<img  width='1' height='1' style='border:0; visibility: hidden;' src='", PixelPath/binary, "'>
