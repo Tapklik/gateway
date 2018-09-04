@@ -258,7 +258,7 @@ parse_imp(Path, BR) ->
 				<<"bidfloor">> => Bidfloor,
 				<<"instl">> => Instl,
 				<<"impid">> => ImpId,
-				<<"metric">> => Metric
+				<<"metric">> => parse_metric(Metric)
 			}
 	end.
 
@@ -312,6 +312,20 @@ parse_cat([H | _] = Paths, BR) when is_list(H) ->
 	Cat1 = lists:flatten([find(Path, BR, []) || Path <- Paths]),
 	Cat2 = [get_cat_root(Cat) || Cat <- Cat1],
 	lists:usort(lists:merge(Cat1, Cat2)).
+
+
+parse_metric([]) ->
+	[];
+parse_metric(Metric) ->
+	parse_metric(Metric, #{}).
+parse_metric([], Acc) -> Acc;
+parse_metric([H| T], Acc) ->
+	#{
+		<<"type">> := T,
+		<<"value">> := V
+	} = H,
+	parse_metric(T, Acc#{T => V}).
+
 
 %%%%%%%%%%%%%%%%%%%%%%
 %%%    INTERNAL    %%%
