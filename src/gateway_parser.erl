@@ -343,7 +343,7 @@ parse_app(App) ->
 	Mobile = tk_maps:get([<<"mobile">>], App, 0),
 	Amp = tk_maps:get([<<"ext">>, <<"mobile">>], App, 0),
 	Language = tk_maps:get([<<"content">>, <<"langauage">>], App, <<"en">>),
-	ContentRating = tk_maps:get([<<"content">>, <<"contentrating">>], App, <<"">>)
+	ContentRating = tk_maps:get([<<"content">>, <<"contentrating">>], App, <<"">>),
 	#{
 		<<"type">> => <<"app">>,
 		<<"id">> => PubId,
@@ -369,7 +369,7 @@ parse_site(Site) ->
 	Mobile = tk_maps:get([<<"mobile">>], Site, 0),
 	Amp = tk_maps:get([<<"ext">>, <<"mobile">>], Site, 0),
 	Language = tk_maps:get([<<"content">>, <<"langauage">>], Site, <<"en">>),
-	ContentRating = tk_maps:get([<<"content">>, <<"contentrating">>], Site, <<"">>)
+	ContentRating = tk_maps:get([<<"content">>, <<"contentrating">>], Site, <<"">>),
 	#{
 		<<"type">> => <<"app">>,
 		<<"id">> => PubId,
