@@ -60,7 +60,7 @@ getf_internal([Key | PathRest], Map, Default) ->
             getf_internal(PathRest, Value, Default)
     catch
         _:_ ->
-            {error, bad_key}
+            Default
     end;
 getf_internal([], Value, _) ->
     Value.

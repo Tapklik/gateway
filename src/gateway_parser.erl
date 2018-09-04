@@ -340,7 +340,7 @@ parse_app(App) ->
 	Bundle = tk_maps:get([<<"bundle">>], App, <<"">>),
 	PubId = tk_maps:get([<<"id">>], App, <<"">>),
 	Country = tk_maps:get([<<"publisher">>, <<"ext">>, <<"country">>], App, <<"">>),
-	Mobile = tk_maps:get([<<"mobile">>], App, 0),
+	Mobile = tk_maps:get([<<"mobile">>], App, 1),
 	Amp = tk_maps:get([<<"ext">>, <<"mobile">>], App, 0),
 	Language = tk_maps:get([<<"content">>, <<"langauage">>], App, <<"en">>),
 	ContentRating = tk_maps:get([<<"content">>, <<"contentrating">>], App, <<"">>),
