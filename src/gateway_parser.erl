@@ -328,7 +328,7 @@ parse_metric([H | T], Acc) ->
 	parse_metric(T, Acc#{Type => Value}).
 
 
-parse_publisher([], BR) ->
+parse_publisher(_Path, BR) ->
 	case maps:is_key(<<"app">>, BR) of
 		true ->
 			parse_app(tk_maps:get([<<"app">>], BR));
