@@ -253,7 +253,7 @@ parse_imp(Path, BR) ->
 			Bidfloor = find(<<"bidfloor">>, Imp, 0.0),
 			Instl = find(<<"instl">>, Value, 0),
 			ImpId = find(<<"id">>, Value, <<"1">>),
-			Metric = find(<<"metric">>, Imp, []),
+			Metric = find(<<"metric">>, Imp, []), tk_lib:echo1(metric, Metric),
 			ParsedImp1#{
 				<<"bidfloor">> => Bidfloor,
 				<<"instl">> => Instl,
