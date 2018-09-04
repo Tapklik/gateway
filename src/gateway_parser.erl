@@ -12,7 +12,8 @@
 	parse_device/2,
 	parse_imp/2,
 	parse_user/2,
-	parse_cat/2
+	parse_cat/2,
+	parse_publisher/2
 ]).
 
 -export([
@@ -139,8 +140,8 @@ parse_rsp(Exchange, Bidder, BidId, RSP0, TimeStamp) ->
 						  <<"
 						  		<a target='_blank' href='", GoogleClickUrlUnesc/binary, ClickTagEsc/binary, "'>
 						  			<img src='", ImpPath/binary, "' width='", W/binary, "' height='",
-							  		H/binary, "' border='0' alt='' style=' _width:", W/binary, "px; _height:",
-							  		H/binary, "px; _overflow:hidden;'>
+							  H/binary, "' border='0' alt='' style=' _width:", W/binary, "px; _height:",
+							  H/binary, "px; _overflow:hidden;'>
 						  		</a>
 						  		<script src='", PixelPath/binary, "'>
 						  ">>;
@@ -319,12 +320,67 @@ parse_metric([]) ->
 parse_metric(Metric) ->
 	parse_metric(Metric, #{}).
 parse_metric([], Acc) -> Acc;
-parse_metric([H| T], Acc) ->
+parse_metric([H | T], Acc) ->
 	#{
 		<<"type">> := Type,
 		<<"value">> := Value
 	} = H,
 	parse_metric(T, Acc#{Type => Value}).
+
+
+parse_publisher([], BR) ->
+	case maps:is_key(<<"app">>, BR) of
+		true ->
+			parse_app(tk_maps:get([<<"app">>], BR));
+		_ ->
+			parse_site(tk_maps:get([<<"site">>], BR))
+	end.
+
+parse_app(App) ->
+	Bundle = tk_maps:get([<<"bundle">>], App, <<"">>),
+	PubId = tk_maps:get([<<"id">>], App, <<"">>),
+	Country = tk_maps:get([<<"publisher">>, <<"ext">>, <<"country">>], App, <<"">>),
+	Mobile = tk_maps:get([<<"mobile">>], App, 0),
+	Amp = tk_maps:get([<<"ext">>, <<"mobile">>], App, 0),
+	Language = tk_maps:get([<<"content">>, <<"langauage">>], App, <<"en">>),
+	ContentRating = tk_maps:get([<<"content">>, <<"contentrating">>], App, <<"">>)
+	#{
+		<<"type">> => <<"app">>,
+		<<"id">> => PubId,
+		<<"domain">> => Bundle,
+		<<"page">> => Bundle,
+		<<"country">> => Country,
+		<<"mobile">> => Mobile,
+		<<"amp">> => Amp,
+		<<"language">> => Language,
+		<<"contentrating">> => ContentRating
+	}.
+
+
+parse_site(Site) ->
+	Page = tk_maps:get([<<"page">>], Site, <<"">>),
+	Domain = case tk_maps:get([<<"domain">>], Site, undefined) of
+				 undefined ->
+					 get_domain_from_page(Page);
+				 D -> D
+			 end,
+	PubId = tk_maps:get([<<"id">>], Site, <<"">>),
+	Country = tk_maps:get([<<"publisher">>, <<"ext">>, <<"country">>], Site, <<"">>),
+	Mobile = tk_maps:get([<<"mobile">>], Site, 0),
+	Amp = tk_maps:get([<<"ext">>, <<"mobile">>], Site, 0),
+	Language = tk_maps:get([<<"content">>, <<"langauage">>], Site, <<"en">>),
+	ContentRating = tk_maps:get([<<"content">>, <<"contentrating">>], Site, <<"">>)
+	#{
+		<<"type">> => <<"app">>,
+		<<"id">> => PubId,
+		<<"domain">> => Domain,
+		<<"page">> => Page,
+		<<"country">> => Country,
+		<<"mobile">> => Mobile,
+		<<"amp">> => Amp,
+		<<"language">> => Language,
+		<<"contentrating">> => ContentRating
+	}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%
@@ -466,6 +522,13 @@ cat_value_to_binary(<<"8">>) -> 8;
 cat_value_to_binary(<<"9">>) -> 9;
 cat_value_to_binary(X) -> binary_to_float(X).
 
+
+get_domain_from_page(Page) ->
+	{match, [Domain]} =
+		re:run(Page, <<"(?:https?:\\/\\/)?(?:www\\.)?([A-Za-z0-9._%+-]+)\\/?.*">>, [{capture, all_but_first, list}]),
+	Domain.
+
+
 %% @hidden
 openrtb_parser() ->
 	% TODO: Return bcat to 	{<<"bcat">>, {find, []}, [<<"bcat">>]}
@@ -486,5 +549,5 @@ openrtb_parser() ->
 		{<<"language">>, {find, <<"">>}, [<<"device">>, <<"language">>]},
 		{<<"imp">>, parse_imp, [<<"imp">>]},
 		{<<"user">>, {find, []}, [<<"user">>]},
-		{<<"">>, {find_either, []}, [{<<"app">>, [<<"app">>]}, {<<"site">>, [<<"site">>]}]}
+		{<<"publisher">>, parse_publisher, []}
 	].
