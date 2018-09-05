@@ -523,16 +523,11 @@ cat_value_to_binary(<<"9">>) -> 9;
 cat_value_to_binary(X) -> binary_to_float(X).
 
 
+get_domain_from_page(<<"">>) -> <<"">>;
 get_domain_from_page(Page) ->
-	try
 	{match, [Domain]} =
 		re:run(Page, <<"(?:https?:\\/\\/)?(?:www\\.)?([A-Za-z0-9._%+-]+)\\/?.*">>, [{capture, all_but_first, list}]),
-	Domain
-	catch
-		_:_ ->
-		tk_lib:echo1(domain, Page),
-		<<"">>
-	end.
+	Domain.
 
 
 %% @hidden
