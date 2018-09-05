@@ -3,9 +3,20 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+-
+
+
+## [0.2.3] - 2018-09-08
+### Added
+- Added "metrics" and "publisher" to bids parsing
+
+### Changed
 - Change bids parsing to improve performance
 - Change rsp_parser &ct= to &clickTag=
 
+### Fixed
+
+### Removed
 
 
 ## [0.2.2] - 2018-04-10
