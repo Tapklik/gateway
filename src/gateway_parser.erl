@@ -524,7 +524,7 @@ cat_value_to_binary(X) -> binary_to_float(X).
 
 
 get_domain_from_page(<<"">>) -> <<"">>;
-get_domain_from_page(Page) when is_integer(Page)-> integer_to_binary(Page);
+get_domain_from_page(Page) when is_integer(Page)-> tk_lib:echo1(int, inte), integer_to_binary(Page);
 get_domain_from_page(Page) ->
 	{match, [Domain]} =
 		re:run(Page, <<"(?:https?:\\/\\/)?(?:www\\.)?([A-Za-z0-9._%+-]+)\\/?.*">>, [{capture, all_but_first, list}]),
