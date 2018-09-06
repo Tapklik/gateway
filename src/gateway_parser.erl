@@ -528,7 +528,7 @@ get_domain_from_page(Page) when is_integer(Page)-> tk_lib:echo1(int, inte), inte
 get_domain_from_page(Page) when is_binary(Page) -> tk_lib:echo1(page, Page),
 	{match, [Domain]} =
 		re:run(Page, <<"(?:https?:\\/\\/)?(?:www\\.)?([A-Za-z0-9._%+-]+)\\/?.*">>, [{capture, all_but_first, list}]),
-	tk_lib:echo1(Domain, Page),Domain;
+	tk_lib:echo1(Domain, Page), list_to_binary(Domain);
 get_domain_from_page(Page) -> tk_lib:echo1(else, Page), Page.
 
 
