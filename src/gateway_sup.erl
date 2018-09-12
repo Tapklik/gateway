@@ -34,26 +34,6 @@ start_link() ->
 %% @private
 init([]) ->
 
-	%% Pooler supervisor that supervises in turn gateway_bids_handler pool
-	Pooler = #{
-		id => pooler_sup,
-		start => {pooler_sup, start_link, []},
-		restart => permanent,
-		shutdown => infinity,
-		type => supervisor,
-		modules => [pooler_sup]
-	},
-
-	%% RabbitMQ supervisor that supervisor the RMQ subscribers
-	RmqSup = #{
-		id => rmq_sup,
-		start => {rmq_sup, start_link, []},
-		restart => permanent,
-		shutdown => infinity,
-		type => supervisor,
-		modules => [rmq_sup]
-	},
-
 	%% Gateway_dist (for distributed) gen_server
 	GatewayDist = #{
 		id => gateway_dist,
@@ -84,7 +64,7 @@ init([]) ->
 		modules => [time_server]
 	},
 
-	Children = [Pooler, RmqSup, VMServer, GatewayDist, TimeServer],
+	Children = [VMServer, GatewayDist, TimeServer],
 	RestartStrategy = {one_for_one, 10, 300},
 	{ok, {RestartStrategy, Children}}.
 

@@ -14,9 +14,11 @@
 		goldrush,
 		sasl,
 		statsderl,
-		bertconf
+		bertconf,
+		pooler,
+		rmq
 	]},
-	{included_applications, [pooler]},
+	{included_applications, []},
 	{mod, {gateway, []}},
 	{env, []}
 ]}.

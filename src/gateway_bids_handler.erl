@@ -188,5 +188,5 @@ log_bid(BidId, List, true) when is_list(List)->
 			Acc#{K => V}
 		end
 	, Bid1, List),
-	rmq:publish(bids_debug, term_to_binary(Bid2)).
+	rmq:publish(bids_debug, Bid2).
 

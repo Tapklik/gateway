@@ -68,14 +68,13 @@ start() ->
 stop(_State) ->
 	ok.
 
-set_start_time(<<0>>) ->
+set_start_time(0) ->
 	time_server:reset_start_time();
-set_start_time(Tbin) ->
-	T = msgpack:binary_to_term(Tbin),
+set_start_time(T) ->
 	time_server:set_start_time(T).
 
 save_bert_file(FileBin) ->
-	[{Filename1, _Content} | _] = binary_to_term(FileBin),
+	[{Filename1, _Content} | _] = FileBin,
 	Filename2 = atom_to_list(Filename1),
 	case file:write_file(?DATA_PATH ++ Filename2 ++ ".bert", FileBin) of
 		ok ->

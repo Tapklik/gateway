@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
--
+- Add rmq dependency
 
 
 ## [0.2.3] - 2018-09-08
