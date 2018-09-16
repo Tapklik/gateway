@@ -450,7 +450,7 @@ parse_imp2(banner, Value) ->
 		<<"expdir">> => Expdir
 	};
 parse_imp2(_, _) ->
-	unsupported.
+	invalid.
 
 %% @hidden
 parse_formats(Formats) ->
