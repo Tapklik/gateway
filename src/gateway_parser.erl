@@ -40,10 +40,9 @@
 -spec parse_br(br()) -> invalid_br | br().
 parse_br(BR0) ->
 	parse_br(openrtb_parser(), BR0, #{}).
-parse_br(P, BR, invalid_br) ->
-	?WARN("GATEWAY: Error parsing BR parameter [ ~p ]. (~n BR:  ~p )", [P, BR]),
-	invalid_br;
-parse_br(_, _, unsupported) ->
+parse_br(_P, _BR, invalid_br) ->
+	%TODO get back later for native ads, now it's too chatty!
+	% ?WARN("GATEWAY: Error parsing BR parameter [ ~p ]. (~n BR:  ~p )", [P, BR]),
 	invalid_br;
 parse_br([], _BR, BRmap) -> BRmap;
 parse_br([{Parameter, Fun, Args} | T], BR, BRmap) ->
@@ -54,7 +53,6 @@ parse_br([{Parameter, Fun, Args} | T], BR, BRmap) ->
 			   end,
 	BRmap2 = case Function of
 				 invalid -> invalid_br;
-				 unsupported -> unsupported;
 				 ignore -> BRmap;
 				 {kv, Key, Value} -> maps:put(Key, Value, BRmap);
 				 Value -> maps:put(Parameter, Value, BRmap)
