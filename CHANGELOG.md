@@ -3,7 +3,19 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+
+
+## [0.2.4] - 2018-09-16
+### Added
 - Add rmq dependency
+
+### Changed
+
+### Fixed
+- Fixed wins logging
+
+### Removed
+- Removed rmq.hrl and added all configs for RMQ in global
 
 
 ## [0.2.3] - 2018-09-08

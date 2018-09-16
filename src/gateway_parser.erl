@@ -43,6 +43,8 @@ parse_br(BR0) ->
 parse_br(P, BR, invalid_br) ->
 	?WARN("GATEWAY: Error parsing BR parameter [ ~p ]. (~n BR:  ~p )", [P, BR]),
 	invalid_br;
+parse_br(_, _, unsupported) ->
+	invalid_br;
 parse_br([], _BR, BRmap) -> BRmap;
 parse_br([{Parameter, Fun, Args} | T], BR, BRmap) ->
 	%% Fun can be in the form of: fun or {fun, default}
@@ -52,6 +54,7 @@ parse_br([{Parameter, Fun, Args} | T], BR, BRmap) ->
 			   end,
 	BRmap2 = case Function of
 				 invalid -> invalid_br;
+				 unsupported -> unsupported;
 				 ignore -> BRmap;
 				 {kv, Key, Value} -> maps:put(Key, Value, BRmap);
 				 Value -> maps:put(Parameter, Value, BRmap)
@@ -449,7 +452,7 @@ parse_imp2(banner, Value) ->
 		<<"expdir">> => Expdir
 	};
 parse_imp2(_, _) ->
-	invalid.
+	unsupported.
 
 %% @hidden
 parse_formats(Formats) ->
