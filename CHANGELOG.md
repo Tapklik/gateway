@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+- Added init.es script capability
 
 
 ## [0.2.4] - 2018-09-16

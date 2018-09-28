@@ -61,6 +61,7 @@ start() ->
 	[rmq:start_publisher(Publisher) || Publisher <- ?RMQ_PUBLISHERS],
 	?INFO("POOLER: Started ~p pool, with initial count of ~p and max count of ~p",
 		[bids_pooler, ?BIDS_POOLER_INIT_COUNT, ?BIDS_POOLER_MAX_COUNT]),
+	init(),
 	pooler:new_pool(BidsPooler).
 
 %% todo fix stop
@@ -87,6 +88,20 @@ save_bert_file(FileBin) ->
 %%%%%%%%%%%%%%%%%%%%%%
 %%%    INTERNAL    %%%
 %%%%%%%%%%%%%%%%%%%%%%
+
+init() ->
+	timer:sleep(20000),
+	try
+		{ok, MFAs} = file:consult("init.es"),
+		lists:foreach(
+			fun({M, F, A}) ->
+				R = erlang:apply(M, F, A),
+				?INFO("GATEWAY: Initiate started! (M: ~p, F: ~p, A:..., Result: ~p)", [M, F, R])
+			end
+			, MFAs)
+	catch
+		_:_ -> ok
+	end.
 
 %% @hidden
 dep_apps(App) ->
